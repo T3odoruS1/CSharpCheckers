@@ -1,4 +1,6 @@
 ﻿
+using ConsoleUI;
+using GameBrain;
 using MenuSystem;
 
 
@@ -25,27 +27,12 @@ var mainMenu = new Menu(EMenuLevel.Main,
           new MenuItem("O", "Options", secondMenu.RunMenu)
      });
 
-//var choice = mainMenu.RunMenu();
 
-Console.BackgroundColor
-     = ConsoleColor.White;
+// UI can draw the board upto 1000 cells high and 676 cells in width.
+// I doubt that we we'll need more :)
 
-Console.ForegroundColor
-     = ConsoleColor.Black;
-Console.WriteLine(" ◉ ", Console.BackgroundColor, Console.ForegroundColor);
-
-Console.ForegroundColor
-     = ConsoleColor.Black;
-
-Console.BackgroundColor
-     = ConsoleColor.White;
-Console.WriteLine(" ◎ ", Console.BackgroundColor, Console.BackgroundColor);
-
-Console.BackgroundColor
-     = ConsoleColor.Black;
-
-Console.WriteLine(" ◉ ", Console.BackgroundColor, Console.ForegroundColor);
-Console.WriteLine(" ◎ ", Console.BackgroundColor);
+var game = new CheckersBrain(8, 8);
+UI.DrawGameBoard(game.GetBoard());
 
 
 string DoNewGame()
