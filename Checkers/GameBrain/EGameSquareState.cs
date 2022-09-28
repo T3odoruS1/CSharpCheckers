@@ -2,8 +2,8 @@ namespace GameBrain;
 
 public enum EGameSquareState
 
-// According to the rules of the checker both player's checkers start on the same color and cannot move into different
-// color square. Therefore we need only empty cell and cell with each of the checkers. Black cell as playable f
+// According to the rules of the checker both player's checkers start on the same color and cannot move into different color square.
+// Therefore we need only empty cell and cell with each of the checkers. Black cell as playable f
 {
     Unplayable, // This is while. We don't play on them
     Empty, // Black cell with no checkers

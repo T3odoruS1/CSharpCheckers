@@ -84,11 +84,10 @@ public class CheckersBrain
         
     }
 
-
+    // Deep copy of the array
     public EGameSquareState?[,] GetBoard()
     {
         var res = new EGameSquareState?[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
-        // Array.Copy(_gameBoard, res, _gameBoard.Length);
         for (var i = 0; i < _gameBoard.GetLength(0); i++)
         {
             for (var j = 0; j < _gameBoard.GetLength(1); j++)
