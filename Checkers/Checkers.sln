@@ -2,6 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckersApp", "CheckersApp\CheckersApp.csproj", "{CF16A40B-EFDF-43BF-AAE8-5CF42C01BE36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{3C64A00E-3BA4-4754-B3F6-4F04B76D2766}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{B99F2F51-8D17-4033-8F6B-9E2D46B7DC0C}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBrain", "GameBrain\GameBrain.csproj", "{BAE832A7-5DC9-40AA-8DF0-C770AD4A859E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +21,13 @@ Global
 		{CF16A40B-EFDF-43BF-AAE8-5CF42C01BE36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF16A40B-EFDF-43BF-AAE8-5CF42C01BE36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF16A40B-EFDF-43BF-AAE8-5CF42C01BE36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C64A00E-3BA4-4754-B3F6-4F04B76D2766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C64A00E-3BA4-4754-B3F6-4F04B76D2766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C64A00E-3BA4-4754-B3F6-4F04B76D2766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C64A00E-3BA4-4754-B3F6-4F04B76D2766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE832A7-5DC9-40AA-8DF0-C770AD4A859E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE832A7-5DC9-40AA-8DF0-C770AD4A859E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE832A7-5DC9-40AA-8DF0-C770AD4A859E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE832A7-5DC9-40AA-8DF0-C770AD4A859E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
