@@ -31,11 +31,11 @@ public class CheckersBrain
                         
                         //Black cell
                         
-                        if (i < 3)
+                        if (i <= boardHeight / 2 - 2)
                         {
                             //White checker in black cell
                             _gameBoard[j, i] = EGameSquareState.White;
-                        }else if (i > boardHeight - 4)
+                        }else if (i >= boardHeight / 2 + 1)
                         {
                             //Black checker in black cell
                             _gameBoard[j, i] = EGameSquareState.Black;
@@ -55,12 +55,12 @@ public class CheckersBrain
                     {
                         
                         //Black cell
-                        if (i > boardHeight - 4)
+                        if (i >= boardHeight / 2 + 1)
                         {
                             //Black checker in black cell
                             _gameBoard[j, i] = EGameSquareState.Black;
                         }
-                        else if(i < 3)
+                        else if(i <= boardHeight / 2 - 2)
                         {
                             // White checker in black cell
                             _gameBoard[j, i] = EGameSquareState.White;

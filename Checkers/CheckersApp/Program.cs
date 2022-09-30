@@ -31,7 +31,7 @@ var mainMenu = new Menu(EMenuLevel.Main,
 // UI can draw the board upto 1000 cells high and 676 cells in width.
 // I doubt that we we'll need more :)
 // Numbers must be even
-var game = new CheckersBrain(16, 16);
+var game = new CheckersBrain(8, 8);
 UI.DrawGameBoard(game.GetBoard());
 
 
