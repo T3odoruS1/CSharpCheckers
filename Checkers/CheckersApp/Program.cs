@@ -7,7 +7,7 @@ var thirdMenu = new Menu(EMenuLevel.Other,
      ">  Checkers third level  <",
      new List<MenuItem>()
      {
-          new MenuItem("N", "Nothing", NothingMethod),
+          new MenuItem("N", "Easter egg", EasterEggMethod),
      });
 var secondMenu = new Menu(EMenuLevel.Second,
      ">  Checkers second level  <",
@@ -78,16 +78,17 @@ string LoadNewGame()
 {
      Console.Clear();
      
-     Console.WriteLine("\nLoad game method");
+     Console.WriteLine("\nLoad game method not implemented yet.");
      return "X";
 }
 
-string NothingMethod()
+string EasterEggMethod()
 {
 
      Console.Clear();
 
-     Console.WriteLine("\nNothing method");
+     Console.WriteLine("\n - Hello there!");
+     Console.WriteLine(" - General Kenobi!");
      return "X";
 }
 
