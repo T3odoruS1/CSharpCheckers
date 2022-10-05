@@ -6,7 +6,7 @@ namespace MenuSystem;
     {
         const int startX = 5;
         const int startY = 5;
-        const int optionsPerLine = 3;
+        const int optionsPerLine = 1;
         const int spacingPerLine = 14;
 
         var currentSelection = 0;
