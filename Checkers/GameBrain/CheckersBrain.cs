@@ -1,4 +1,6 @@
-﻿namespace GameBrain;
+﻿using static System.ConsoleKey;
+
+namespace GameBrain;
 
 public class CheckersBrain
 {
@@ -99,6 +101,8 @@ public class CheckersBrain
         return res;
 
     }
+    
+    
     
     
     

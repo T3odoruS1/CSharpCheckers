@@ -13,6 +13,9 @@ public class Menu
     private readonly MenuItem _menuItemExit = new MenuItem(ShortcutExit, "Exit", null);
     private readonly MenuItem _menuItemGoBack = new MenuItem(ShortcutGoBack, "Back", null);
     private readonly MenuItem _menuItemGoToMain = new MenuItem(ShortcutGoMain, "Main menu", null);
+    private readonly List<string> _menuItemsAsString = new List<string>();
+    private bool menuDone = false;
+    private string userChoice = "";
 
 
     public Menu(EMenuLevel level, string title, List<MenuItem> menuItems)
@@ -30,34 +33,39 @@ public class Menu
         if (_level == EMenuLevel.Other)
             _menuItems.Add(ShortcutGoMain, _menuItemGoToMain);
         _menuItems.Add(ShortcutExit, _menuItemExit);
+                
+        foreach (var dictValue in _menuItems.Values)
+        {
+            _menuItemsAsString.Add(dictValue.Title);
+        }
     }
 
     public string RunMenu()
     {
-        string userChoice;
-        var menuDone = false;
+        
         do
         {
-            Console.WriteLine(Title);
-            Console.WriteLine("================");
-            foreach (var menuItem in _menuItems.Values)
+            string? methodReturnValue = null;
+            if (userChoice == ShortcutExit)
             {
-                Console.WriteLine(menuItem);
+                menuDone = true;
+                userChoice = methodReturnValue ?? userChoice;
+                continue;
+
             }
-
-
-            Console.WriteLine("================");
-            Console.WriteLine("Your choice: ");
-            userChoice = Console.ReadLine()?.ToUpper().Trim() ?? "";
-
+            userChoice = GetNewUserInput();
             if (_menuItems.ContainsKey(userChoice))
             {
-                string? methodReturnValue = null;
                 if (_menuItems[userChoice].MethodToRun != null)
                 {
                     methodReturnValue = _menuItems[userChoice].MethodToRun!();
                 }
 
+
+                if (methodReturnValue == ShortcutGoBack)
+                {
+                    
+                }
                 if (userChoice == ShortcutGoBack)
                 {
                     menuDone = true;
@@ -82,5 +90,27 @@ public class Menu
         } while (menuDone == false);
 
         return userChoice;
+    }
+
+    private string GetNewUserInput()
+    {
+        var selectedClass = ConsoleHelper.MultipleChoice(true, Title, _menuItemsAsString.ToArray());
+
+        var userChoice = "";
+
+        foreach (var keyValuePair in _menuItems)
+        {
+            if (!keyValuePair.Value.Title.Contains(selectedClass)) continue;
+            userChoice = keyValuePair.Key;
+            break;
+        }
+
+        return userChoice;
+    }
+
+    public void ExitMenu()
+    {
+        userChoice = ShortcutExit;
+        menuDone = true;
     }
 }
