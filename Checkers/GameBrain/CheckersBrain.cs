@@ -9,6 +9,14 @@ public class CheckersBrain
     
     public CheckersBrain(int boardWidth = 8, int boardHeight = 8)
     {
+        
+        // Throw exception if numbers not even
+        if (boardHeight % 2 != 0 || boardWidth % 2 != 0)
+        {
+            throw new ArgumentException(
+                "Game brains got incorrect board dimensions. They should be even numbers from 4. Your numbers: " 
+                + boardHeight + " " + boardWidth);
+        }
         _gameBoard = new EGameSquareState[boardWidth, boardHeight];
         
         

@@ -36,10 +36,41 @@ mainMenu.RunMenu();
 string DoNewGame()
 {
      Console.Clear();
-     Console.WriteLine("\nNew game method");
-     var game = new CheckersBrain(8, 8);
-     UI.DrawGameBoard(game.GetBoard());
+     Console.WriteLine("\nNew game! Time to play!");
+
+     var widthConvertedSuccessfully = false;
+     var heightConvertedSuccessfully = false;
+     int convertedWidth;
+     int convertedHeight;
+     var numbersEven = false;
+     do
+     {
+          Console.WriteLine("Enter board width. Only even numbers starting from 4 -->  ");
+          widthConvertedSuccessfully = int.TryParse(Console.ReadLine(), out convertedWidth);
+          Console.WriteLine("Enter board height. Only even numbers starting from 4 -->  ");
+          heightConvertedSuccessfully = int.TryParse(Console.ReadLine(), out convertedHeight);
+          if (!widthConvertedSuccessfully || !heightConvertedSuccessfully)
+          {
+               Console.WriteLine("Enter board size correctly. Enter even numbers form 4\n");
+               continue;
+          }
+
+          if (convertedHeight % 2 == 0 && convertedWidth % 2 == 0)
+          {
+               numbersEven = true;
+          }
+          else
+          {
+               Console.WriteLine("Enter board size correctly. Enter even numbers form 4\n");
+          }
+
+     } while (!widthConvertedSuccessfully || !heightConvertedSuccessfully || !numbersEven);
      
+     
+     var game = new CheckersBrain(convertedWidth, convertedHeight);
+     UI.DrawGameBoard(game.GetBoard());
+
+
      return "X";
 }
 
