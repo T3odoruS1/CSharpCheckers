@@ -89,6 +89,17 @@ string EasterEggMethod()
 
      Console.WriteLine("\n - Hello there!");
      Console.WriteLine(" - General Kenobi!");
+     Console.WriteLine(@"     
+          _ 💀_
+         / _|_ \
+        /  /|\  \
+      🧪  / | \  🔪
+         🖍_|_ 🌂
+          /    \
+         /      \
+         \      /
+         _\    /_
+         ");
      return "X";
 }
 
