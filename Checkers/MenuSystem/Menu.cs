@@ -14,8 +14,8 @@ public class Menu
     private readonly MenuItem _menuItemGoBack = new MenuItem(ShortcutGoBack, "Back", null);
     private readonly MenuItem _menuItemGoToMain = new MenuItem(ShortcutGoMain, "Main menu", null);
     private readonly List<string> _menuItemsAsString = new List<string>();
-    private bool menuDone = false;
-    private string userChoice = "";
+    private bool _menuDone;
+    private string _userChoice = "";
 
 
     public Menu(EMenuLevel level, string title, List<MenuItem> menuItems)
@@ -46,19 +46,19 @@ public class Menu
         do
         {
             string? methodReturnValue = null;
-            if (userChoice == ShortcutExit)
+            if (_userChoice == ShortcutExit)
             {
-                menuDone = true;
-                userChoice = methodReturnValue ?? userChoice;
+                _menuDone = true;
+                _userChoice = methodReturnValue ?? _userChoice;
                 continue;
 
             }
-            userChoice = GetNewUserInput();
-            if (_menuItems.ContainsKey(userChoice))
+            _userChoice = GetNewUserInput();
+            if (_menuItems.ContainsKey(_userChoice))
             {
-                if (_menuItems[userChoice].MethodToRun != null)
+                if (_menuItems[_userChoice].MethodToRun != null)
                 {
-                    methodReturnValue = _menuItems[userChoice].MethodToRun!();
+                    methodReturnValue = _menuItems[_userChoice].MethodToRun!();
                 }
 
 
@@ -66,30 +66,30 @@ public class Menu
                 {
                     
                 }
-                if (userChoice == ShortcutGoBack)
+                if (_userChoice == ShortcutGoBack)
                 {
-                    menuDone = true;
+                    _menuDone = true;
                 }
 
                 if (methodReturnValue == ShortcutExit ||
-                    userChoice == ShortcutExit)
+                    _userChoice == ShortcutExit)
                 {
-                    userChoice = methodReturnValue ?? userChoice;
-                    menuDone = true;
+                    _userChoice = methodReturnValue ?? _userChoice;
+                    _menuDone = true;
                 }
 
-                if ((userChoice != ShortcutGoMain && methodReturnValue != ShortcutGoMain)
+                if ((_userChoice != ShortcutGoMain && methodReturnValue != ShortcutGoMain)
                     || _level == EMenuLevel.Main) continue;
-                userChoice = methodReturnValue ?? userChoice;
-                menuDone = true;
+                _userChoice = methodReturnValue ?? _userChoice;
+                _menuDone = true;
             }
             else
             {
                 Console.WriteLine("\n Enter one of the options");
             }
-        } while (menuDone == false);
+        } while (_menuDone == false);
 
-        return userChoice;
+        return _userChoice;
     }
 
     private string GetNewUserInput()
@@ -110,7 +110,7 @@ public class Menu
 
     public void ExitMenu()
     {
-        userChoice = ShortcutExit;
-        menuDone = true;
+        _userChoice = ShortcutExit;
+        _menuDone = true;
     }
 }
