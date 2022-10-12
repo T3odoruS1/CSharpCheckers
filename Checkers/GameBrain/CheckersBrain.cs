@@ -1,4 +1,4 @@
-﻿using static System.ConsoleKey;
+﻿using Domain;
 
 namespace GameBrain;
 
@@ -7,9 +7,10 @@ public class CheckersBrain
 
     private readonly EGameSquareState[,] _gameBoard;
     
-    public CheckersBrain(int boardWidth = 8, int boardHeight = 8)
+    public CheckersBrain(GameOptions options)
     {
-        
+        var boardWidth = options.Width;
+        var boardHeight = options.Height;
         // Throw exception if numbers not even
         if (boardHeight % 2 != 0 || boardWidth % 2 != 0)
         {

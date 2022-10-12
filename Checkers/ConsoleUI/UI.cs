@@ -46,7 +46,7 @@ public static class UI
                     case EGameSquareState.Unplayable:
                         Console.BackgroundColor = ConsoleColor.White;
                         Console.Write("   ");
-                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ResetColor();
                         break;
                     case EGameSquareState.BlackKing:
                         Console.Write("=◎=");
