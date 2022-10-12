@@ -22,13 +22,12 @@ var secondMenu = new Menu(EMenuLevel.Second,
      ">  Checkers options  <",
      new List<MenuItem>()
 {
+     new MenuItem("N", "Current Game Options", PrintCurrentGameOptions),
      new MenuItem("C", "Create options", CreateGameOptions),
-
      new MenuItem("O", "List saved options", ListGameOptions),
      new MenuItem("L", "Load options", LoadGameOptions),
      new MenuItem("D", "Delete options", DeleteOptions),
      new MenuItem("S", "Save current options", SaveCurrentOptions),
-     new MenuItem("E", "Edit current options", null),
      new MenuItem("T", "Something to be found here ;)", thirdMenu.RunMenu)
 
 });
@@ -49,11 +48,13 @@ mainMenu.RunMenu();
 // Numbers must be even
 
 
+
+// Print out all game options and load one that user chooses.
 string LoadNewGame()
 {
      Console.Clear();
      
-     Console.WriteLine("\nLoad game method not implemented yet.");
+     Console.WriteLine("Load game: ");
      var boards = stateRepositoryFileSystem.GetGameStatesList();
      int i = 1;
      Dictionary<int, string> boardMap = new Dictionary<int, string>();
@@ -65,20 +66,26 @@ string LoadNewGame()
           i++;
      }
 
-     
-     // Fix later
      Console.WriteLine("Choose one of those");
      var choice = Console.ReadLine();
-     game.SetGameBoard(stateRepositoryFileSystem.GetGameState(boardMap[Int32.Parse(choice!)]));
-     UI.DrawGameBoard(game.GetBoard());
-     //Fix later
-     game = new CheckersBrain(gameOptions);
-     
-     WaitForUserInput();
-     
+     var isNum = Int32.TryParse(choice, out var integerChoice);
+     if (!isNum || !boardMap.ContainsKey(integerChoice))
+     {
+          LoadNewGame();
+     }
+     else
+     {
+          game.SetGameBoard(stateRepositoryFileSystem.GetGameState(boardMap[Int32.Parse(choice!)]));
+          UI.DrawGameBoard(game.GetBoard());
+          game = new CheckersBrain(gameOptions);
+          WaitForUserInput();
+     }
+
      return "B";
 }
 
+
+// Make new game ond use UI method to print the board. Some test code commented out
 string DoNewGame()
 {
      Console.Clear();
@@ -87,42 +94,38 @@ string DoNewGame()
      UI.DrawGameBoard(game.GetBoard());
      WaitForUserInput();
 
+
+     #region Use this code for changing checker positions. For testing saving functionaity
+
+     // // For testing game saving functionality
+     // game.ChangeCheckerPos(0,0,6,5);
+     // //for testing game saving functionality
+     // UI.DrawGameBoard(game.GetBoard());
+     // Console.WriteLine("filename");
+     // var fileName = Console.ReadLine();
+     // stateRepositoryFileSystem.SaveGameState(fileName!, game.GetBoard());
+
+     #endregion
      
-     game.ChangeCheckerPos(0,0,6,5);
-     UI.DrawGameBoard(game.GetBoard());
-     Console.WriteLine("filename");
-     var fileName = Console.ReadLine();
-     stateRepositoryFileSystem.SaveGameState(fileName!, game.GetBoard());
      WaitForUserInput();
-     
-     
      return "B";
 }
 
+
+// Run delete options submenu. Delete one of them or exit this menu
 string DeleteOptions()
 {
+     var optionToDelete = RunSubmenu();
+     if (optionToDelete == "B" ||  optionToDelete == "M" || optionToDelete == "X") return optionToDelete;
+     repositoryFileSystem.DeleteGameOptions(optionToDelete);
      Console.Clear();
-     Console.WriteLine("List of game options:\n\n");
-     Dictionary<int, string> optionsMap = PrintOutAllSavedGameOptionsAndGetDictionary();
-     
-     
-     Console.WriteLine("\nChoose a number of an option you would like to delete.");
-          var userChoice = Console.ReadLine();
-          if (optionsMap.ContainsKey(Int32.Parse(userChoice!)))
-          {
-               repositoryFileSystem.DeleteGameOptions(optionsMap[Int32.Parse(userChoice!)]);
-               Console.WriteLine("Option deleted");
-          }
-          else
-          {
-               Console.WriteLine("No such option found");
-          }
-          WaitForUserInput();
-          return "B";
+     Console.WriteLine("Deleted");
+     WaitForUserInput();
+     return "B";
 }
 
 
-
+// Save current options into json file
 string SaveCurrentOptions()
 {
      
@@ -141,6 +144,8 @@ string SaveCurrentOptions()
      return "B";
 }
 
+
+//List all game options
 string ListGameOptions()
 {
 
@@ -152,32 +157,51 @@ string ListGameOptions()
      return "B";
 }
 
+
+// Run game options menu and load one of them or exit this menu
 string LoadGameOptions()
 {
      
-     
-     
+     var optionToLoad = RunSubmenu();
+     if (optionToLoad == "B" ||  optionToLoad == "M" || optionToLoad == "X") return optionToLoad;
+     gameOptions = repositoryFileSystem.GetGameOptions(optionToLoad);
      Console.Clear();
-     Console.WriteLine("Load game options:");
-     Dictionary<int, string> optionsMap = PrintOutAllSavedGameOptionsAndGetDictionary();
-
-     Console.Write("Choose game option you would like to load -->  ");
-     var userChoice = Console.ReadLine();
-
-
-     if (optionsMap.ContainsKey(Int32.Parse(userChoice!)))
-     {
-          gameOptions = repositoryFileSystem.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]);
-          Console.WriteLine("\n\n\nLoaded: " + repositoryFileSystem.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]));
-     }
-     else
-     {
-          Console.WriteLine("No such game option found");
-     }
+     Console.WriteLine("Loaded!");
      WaitForUserInput();
      return "B"; 
 }
 
+
+// Return option that user has chosen or the shortcut for navigating through the menu
+string RunSubmenu()
+{
+     
+     var menuItems = new List<MenuItem>();
+     var i = 0;
+     var listOfOptions = new List<string>();
+     
+     // For each option choice shortcut is a number in string form, other shortcuts are standard
+     foreach (var gameOption in repositoryFileSystem.GetGameOptionsList())
+     {
+          menuItems.Add(new MenuItem(i.ToString(), 
+               gameOption + ":\t" + repositoryFileSystem.GetGameOptions(gameOption), 
+               null));
+          listOfOptions.Add(gameOption);
+          i++;
+     }
+     var loadMenu = new Menu(EMenuLevel.Other,
+          ">  Checkers  <", menuItems);
+     
+     var userChoice = loadMenu.RunMenu();
+
+     
+     // If user choice is number then return user choice return one of the options that he has chose.
+     // Else return  user choice
+     return !Int32.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j];
+}
+
+
+// Making new game option
 string CreateGameOptions()
 {
      Console.Clear();
@@ -189,6 +213,7 @@ string CreateGameOptions()
      return "B";
 }
 
+// Helper method for CreateGameOption. Validates inputs and sets the parameters for gameOptions object
 void ValidateUserGameOptions()
 {
      bool widthConvertedSuccessfully;
@@ -241,6 +266,8 @@ void ValidateUserGameOptions()
      };
 }
 
+
+// Function used for making menu system wait. Screen will remain the same until Enter key is pressed
 void WaitForUserInput()
 {
      Console.WriteLine("\n\nPress Enter to go back to menu");
@@ -250,6 +277,15 @@ void WaitForUserInput()
           userKey = Console.ReadKey(true).Key;
           
      } while (userKey != Enter);
+}
+
+string PrintCurrentGameOptions()
+{
+     Console.Clear();
+     Console.WriteLine();
+     Console.WriteLine(gameOptions);
+     WaitForUserInput();
+     return "B";
 }
 
 void PrintOutAllSavedGameOptions()
@@ -264,24 +300,6 @@ void PrintOutAllSavedGameOptions()
      }
 }
 
-Dictionary<int, string> PrintOutAllSavedGameOptionsAndGetDictionary()
-{
-     Dictionary<int, string> optionsMap = new Dictionary<int, string>();
-     var optionsList = repositoryFileSystem.GetGameOptionsList();
-     var i = 1;
-     foreach (var option in optionsList)
-     {
-          Console.WriteLine(i + ") Option name:" + option);
-          Console.WriteLine("Option properties: " + repositoryFileSystem.GetGameOptions(option));
-          Console.WriteLine();
-          optionsMap.Add(i, option);
-          i++;
-
-     }
-
-     return optionsMap;
-
-}
 
 string EasterEggMethod()
 {
@@ -307,9 +325,4 @@ string EasterEggMethod()
      WaitForUserInput();
      return "B";
 }
-
-
-
-
-
 

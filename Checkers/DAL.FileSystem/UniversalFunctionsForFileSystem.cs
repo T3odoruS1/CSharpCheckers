@@ -7,6 +7,8 @@ public class UniversalFunctionsForFileSystem
     
     
     
+    // Universal methods for saving boards and game options into json
+    
     public void CheckOrCreateDirectory(string optionsDir)
     {
         if (!Directory.Exists(optionsDir))

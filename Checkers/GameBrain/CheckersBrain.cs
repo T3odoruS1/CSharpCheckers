@@ -124,7 +124,7 @@ public class CheckersBrain
     }
     
     
-    // For testing 
+    // For testing. Swap 2 board cells position
     public void ChangeCheckerPos(int initialX, int initialY, int newX, int newY)
     {
         (_gameBoard[initialX, initialY], _gameBoard[newX, newY]) = (_gameBoard[newX, newY], _gameBoard[initialX, initialY]);

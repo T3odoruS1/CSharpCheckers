@@ -14,6 +14,7 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
 
     private readonly string _optionsDir = "." + 
                                           Path.DirectorySeparatorChar + "options";
+    // List of all saved game opions
     public List<string> GetGameOptionsList()
     {
         _funcs.CheckOrCreateDirectory(_optionsDir);
@@ -27,6 +28,7 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
         return res;
     }
     
+    // Get particular game option by file name
     public GameOptions GetGameOptions(string id)
     
     // id - filename
@@ -42,6 +44,8 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
         return options;
     }
 
+    
+    // Save game option into json file
     public void SaveGameOptions(string id, GameOptions options)
     
     // id - filename

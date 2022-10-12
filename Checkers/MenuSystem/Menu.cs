@@ -54,19 +54,16 @@ public class Menu
 
             }
             _userChoice = GetNewUserInput();
+            var i = 0;
             if (_menuItems.ContainsKey(_userChoice))
+                
             {
                 if (_menuItems[_userChoice].MethodToRun != null)
                 {
                     methodReturnValue = _menuItems[_userChoice].MethodToRun!();
                 }
-
-
-                if (methodReturnValue == ShortcutGoBack)
-                {
-                    
-                }
-                if (_userChoice == ShortcutGoBack)
+                
+                if (_userChoice == ShortcutGoBack || Int32.TryParse(_userChoice, out i))
                 {
                     _menuDone = true;
                 }

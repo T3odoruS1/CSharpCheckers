@@ -15,6 +15,7 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
                                           Path.DirectorySeparatorChar + "gameState";
     
     
+    // List of all saved games
     public List<string> GetGameStatesList()
     {
         _funcs.CheckOrCreateDirectory(_optionsDir);
@@ -28,10 +29,9 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         return res;
     }
 
+    // Convert int array into enum array 
     private EGameSquareState[,] ConvertIntArrayToEnumArray(int[,] board)
     {
-        
-        // Convert int array back to enum array
         var enumBoard = new EGameSquareState[board.GetLength(0), board.GetLength(1)];
 
         for (var i = 0; i < board.GetLength(0); i++)
@@ -45,10 +45,8 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         return enumBoard;
     }
 
+    // Converting board with enums into board with ints. Used for serialization to povide json with ints
     private int[,] ConvertEnumArrayToIntArray(EGameSquareState[,] board)
-    
-    // Enums can be converted to ints and vise versa.
-    // Converting enum 2d array to int 2d array for storing in json file.
     {
         var integerBoard = new int[board.GetLength(0), board.GetLength(1)];
 
@@ -63,6 +61,8 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         return integerBoard;
     }
 
+    
+    // Get game state enum board
     public EGameSquareState[,] GetGameState(string id)
     {
         var fileContent = File.ReadAllText(_funcs.GetFileName(id, _optionsDir));
@@ -76,6 +76,8 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         return enumBoard;
     }
 
+    
+    // Save current game state into json file
     public void SaveGameState(string id, EGameSquareState[,] board)
     {
         _funcs.CheckOrCreateDirectory(_optionsDir);
@@ -90,6 +92,8 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         File.Delete(_funcs.GetFileName(id, _optionsDir));
     }
     
+    
+    // Method is used to convert 2d into jagged arrays. Needed for json serialization
     private T[][] ToJaggedArray<T>( T[,] twoDimensionalArray)
     {
         int rowsFirstIndex = twoDimensionalArray.GetLowerBound(0);
@@ -113,6 +117,8 @@ public class GameStateRepositoryFileSystem : IGameStateRepository
         return jaggedArray;
     }
     
+    
+    // Used to convert jagged arrays into 2d. We get jagged form json, so it is necessary to convert
     private static T[,] JaggedTo2D<T>(T[][] source)
     {
         try
