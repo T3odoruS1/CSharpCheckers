@@ -5,7 +5,7 @@ namespace GameBrain;
 public class CheckersBrain
 {
 
-    private readonly EGameSquareState[,] _gameBoard;
+    private EGameSquareState[,] _gameBoard;
     
     public CheckersBrain(GameOptions options)
     {
@@ -96,9 +96,9 @@ public class CheckersBrain
     }
 
     // Deep copy of the array
-    public EGameSquareState?[,] GetBoard()
+    public EGameSquareState[,] GetBoard()
     {
-        var res = new EGameSquareState?[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
+        var res = new EGameSquareState[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
         for (var i = 0; i < _gameBoard.GetLength(0); i++)
         {
             for (var j = 0; j < _gameBoard.GetLength(1); j++)
@@ -109,6 +109,25 @@ public class CheckersBrain
         
         return res;
 
+    }
+
+    public void SetGameBoard(EGameSquareState[,] board)
+    {
+        try
+        {
+            _gameBoard = board;
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("board was null");
+        }
+    }
+    
+    
+    // For testing 
+    public void ChangeCheckerPos(int initialX, int initialY, int newX, int newY)
+    {
+        (_gameBoard[initialX, initialY], _gameBoard[newX, newY]) = (_gameBoard[newX, newY], _gameBoard[initialX, initialY]);
     }
     
     

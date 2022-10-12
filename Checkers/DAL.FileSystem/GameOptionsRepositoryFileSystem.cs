@@ -10,12 +10,13 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
 {
 
     private const string FileExtension = "json";
+    private readonly UniversalFunctionsForFileSystem _funcs = new UniversalFunctionsForFileSystem();
 
     private readonly string _optionsDir = "." + 
                                           Path.DirectorySeparatorChar + "options";
     public List<string> GetGameOptionsList()
     {
-        CheckOrCreateDirectory();
+        _funcs.CheckOrCreateDirectory(_optionsDir);
         var res = new List<string>();
         foreach (var fileName in Directory.GetFileSystemEntries(
                      _optionsDir, "*" + FileExtension))
@@ -30,7 +31,7 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
     
     // id - filename
     {
-        var fileContent = File.ReadAllText(GetFileName(id));
+        var fileContent = File.ReadAllText(_funcs.GetFileName(id, _optionsDir));
         var options = JsonSerializer.Deserialize<GameOptions>(fileContent);
 
         if (options == null)
@@ -45,32 +46,12 @@ public class GameOptionsRepositoryFileSystem : IGameOptionsRepository
     
     // id - filename
     {
-        CheckOrCreateDirectory();
+        _funcs.CheckOrCreateDirectory(_optionsDir);
         var fileContent = JsonSerializer.Serialize(options);
-        File.WriteAllText(GetFileName(id), fileContent);
+        File.WriteAllText(_funcs.GetFileName(id, _optionsDir), fileContent);
     }
-
-    private string GetFileName(string id)
-    
-    // id - filename
-    {
-        return _optionsDir +
-               Path.DirectorySeparatorChar +
-               id + "." + FileExtension;
-
-
-    }
-    
     public void DeleteGameOptions(string id)
     {
-        File.Delete(GetFileName(id));
-    }
-
-    private void CheckOrCreateDirectory()
-    {
-        if (!Directory.Exists(_optionsDir))
-        {
-            Directory.CreateDirectory(_optionsDir);
-        }
+        File.Delete(_funcs.GetFileName(id, _optionsDir));
     }
 }

@@ -7,7 +7,7 @@ public static class UI
     
     // Main function to draw the board
     
-    public static void DrawGameBoard(EGameSquareState?[,] board)
+    public static void DrawGameBoard(EGameSquareState[,] board)
     {
         var width = board.GetLength(0);
         var height = board.GetLength(1);

@@ -6,9 +6,11 @@ using GameBrain;
 using MenuSystem;
 using static System.ConsoleKey;
 
-
 var gameOptions = new GameOptions();
-var repo = new GameOptionsRepositoryFileSystem();
+var repositoryFileSystem = new GameOptionsRepositoryFileSystem();
+var stateRepositoryFileSystem = new GameStateRepositoryFileSystem();
+var game = new CheckersBrain(gameOptions);
+
 
 var thirdMenu = new Menu(EMenuLevel.Other,
      ">  Checkers third level  <",
@@ -47,17 +49,54 @@ mainMenu.RunMenu();
 // Numbers must be even
 
 
+string LoadNewGame()
+{
+     Console.Clear();
+     
+     Console.WriteLine("\nLoad game method not implemented yet.");
+     var boards = stateRepositoryFileSystem.GetGameStatesList();
+     int i = 1;
+     Dictionary<int, string> boardMap = new Dictionary<int, string>();
+     foreach (var board in boards)
+     {
+          Console.WriteLine(i+")" + board);
+          boardMap.Add(i, board);
+          UI.DrawGameBoard(stateRepositoryFileSystem.GetGameState(board));
+          i++;
+     }
+
+     
+     // Fix later
+     Console.WriteLine("Choose one of those");
+     var choice = Console.ReadLine();
+     game.SetGameBoard(stateRepositoryFileSystem.GetGameState(boardMap[Int32.Parse(choice!)]));
+     UI.DrawGameBoard(game.GetBoard());
+     //Fix later
+     game = new CheckersBrain(gameOptions);
+     
+     WaitForUserInput();
+     
+     return "B";
+}
 
 string DoNewGame()
 {
      Console.Clear();
      Console.WriteLine("\nNew game! Time to play!");
-     
-     var game = new CheckersBrain(gameOptions);
+     game = new CheckersBrain(gameOptions);
      UI.DrawGameBoard(game.GetBoard());
+     WaitForUserInput();
 
-
-     return "X";
+     
+     game.ChangeCheckerPos(0,0,6,5);
+     UI.DrawGameBoard(game.GetBoard());
+     Console.WriteLine("filename");
+     var fileName = Console.ReadLine();
+     stateRepositoryFileSystem.SaveGameState(fileName!, game.GetBoard());
+     WaitForUserInput();
+     
+     
+     return "B";
 }
 
 string DeleteOptions()
@@ -71,7 +110,7 @@ string DeleteOptions()
           var userChoice = Console.ReadLine();
           if (optionsMap.ContainsKey(Int32.Parse(userChoice!)))
           {
-               repo.DeleteGameOptions(optionsMap[Int32.Parse(userChoice!)]);
+               repositoryFileSystem.DeleteGameOptions(optionsMap[Int32.Parse(userChoice!)]);
                Console.WriteLine("Option deleted");
           }
           else
@@ -82,13 +121,7 @@ string DeleteOptions()
           return "B";
 }
 
-string LoadNewGame()
-{
-     Console.Clear();
-     
-     Console.WriteLine("\nLoad game method not implemented yet.");
-     return "X";
-}
+
 
 string SaveCurrentOptions()
 {
@@ -101,7 +134,7 @@ string SaveCurrentOptions()
      Console.WriteLine("How would you like to name this game option?");
      var userInputForFileName = Console.ReadLine();
      
-     repo.SaveGameOptions(userInputForFileName!, gameOptions);
+     repositoryFileSystem.SaveGameOptions(userInputForFileName!, gameOptions);
      Console.CursorVisible = false;
      Console.WriteLine("Game options saved!");
      WaitForUserInput();
@@ -134,8 +167,8 @@ string LoadGameOptions()
 
      if (optionsMap.ContainsKey(Int32.Parse(userChoice!)))
      {
-          gameOptions = repo.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]);
-          Console.WriteLine("\n\n\nLoaded: " + repo.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]));
+          gameOptions = repositoryFileSystem.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]);
+          Console.WriteLine("\n\n\nLoaded: " + repositoryFileSystem.GetGameOptions(optionsMap[Int32.Parse(userChoice!)]));
      }
      else
      {
@@ -221,12 +254,12 @@ void WaitForUserInput()
 
 void PrintOutAllSavedGameOptions()
 {
-     var optionsList = repo.GetGameOptionsList();
+     var optionsList = repositoryFileSystem.GetGameOptionsList();
      var i = 1;
      foreach (var option in optionsList)
      {
           Console.WriteLine(i + ") " + option);
-          Console.WriteLine(repo.GetGameOptions(option));
+          Console.WriteLine(repositoryFileSystem.GetGameOptions(option));
           i++;
      }
 }
@@ -234,12 +267,12 @@ void PrintOutAllSavedGameOptions()
 Dictionary<int, string> PrintOutAllSavedGameOptionsAndGetDictionary()
 {
      Dictionary<int, string> optionsMap = new Dictionary<int, string>();
-     var optionsList = repo.GetGameOptionsList();
+     var optionsList = repositoryFileSystem.GetGameOptionsList();
      var i = 1;
      foreach (var option in optionsList)
      {
           Console.WriteLine(i + ") Option name:" + option);
-          Console.WriteLine("Option properties: " + repo.GetGameOptions(option));
+          Console.WriteLine("Option properties: " + repositoryFileSystem.GetGameOptions(option));
           Console.WriteLine();
           optionsMap.Add(i, option);
           i++;
@@ -274,4 +307,9 @@ string EasterEggMethod()
      WaitForUserInput();
      return "B";
 }
+
+
+
+
+
 
