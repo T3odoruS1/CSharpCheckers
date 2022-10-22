@@ -129,6 +129,11 @@ public class CheckersBrain
     {
         (_gameBoard[initialX, initialY], _gameBoard[newX, newY]) = (_gameBoard[newX, newY], _gameBoard[initialX, initialY]);
     }
+
+    public void PlayGame()
+    {
+        Console.WriteLine("Gameplay not implemented yet.");
+    }
     
     
     

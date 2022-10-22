@@ -7,9 +7,14 @@ using MenuSystem;
 using static System.ConsoleKey;
 
 var gameOptions = new GameOptions();
-var repositoryFileSystem = new GameOptionsRepositoryFileSystem();
-var stateRepositoryFileSystem = new GameStateRepositoryFileSystem();
-var game = new CheckersBrain(gameOptions);
+var repo = new GameRepositoryFileSystem();
+CheckersBrain game = new CheckersBrain(gameOptions);
+gameOptions.Name = "Default";
+
+
+
+#region MenuInitialization
+
 
 
 var thirdMenu = new Menu(EMenuLevel.Other,
@@ -32,17 +37,42 @@ var secondMenu = new Menu(EMenuLevel.Second,
 
 });
 
+
 var mainMenu = new Menu(EMenuLevel.Main,
      ">  Checkers  <",
      new List<MenuItem>()
      {
           new MenuItem("N", "New Game", DoNewGame),
-          new MenuItem("L", "Load Game", LoadNewGame),
+          new MenuItem("L", "Load Game", LoadGame),
+          new MenuItem("D", "Delete SavedGame", DeleteSavedGame),
+
           new MenuItem("O", "Options", secondMenu.RunMenu)
      });
 
+#endregion
+
+
+
+
+#region Load last used game option. And save current options on exit
+
+try
+{
+     gameOptions = repo.GetGameOptions("LastLoaded");
+
+}
+catch (Exception)
+{
+     gameOptions = new GameOptions();
+}
 
 mainMenu.RunMenu();
+
+repo.SaveGameOptions("LastLoaded", gameOptions);
+
+#endregion
+
+
 // UI can draw the board upto 1000 cells high and 676 cells in width.
 // I doubt that we we'll need more :)
 // Numbers must be even
@@ -50,37 +80,80 @@ mainMenu.RunMenu();
 
 
 // Print out all game options and load one that user chooses.
-string LoadNewGame()
-{
-     Console.Clear();
-     
-     Console.WriteLine("Load game: ");
-     var boards = stateRepositoryFileSystem.GetGameStatesList();
-     int i = 1;
-     Dictionary<int, string> boardMap = new Dictionary<int, string>();
-     foreach (var board in boards)
+
+
+string DeleteSavedGame(){
+     var allSavedGames = repo.GetGameBoardNames();
+     var i = 1;
+     var gameDict = new Dictionary<int, string>();
+     foreach (var savedGame in allSavedGames)
      {
-          Console.WriteLine(i+")" + board);
-          boardMap.Add(i, board);
-          UI.DrawGameBoard(stateRepositoryFileSystem.GetGameState(board));
+          Console.WriteLine($"{i}) - {savedGame}");
+          Console.WriteLine($"Options : {repo.GetGameOptions(repo.GetGameBoard(savedGame).Values.First())}");
+          var board = repo.GetGameBoard(savedGame);
+          UI.DrawGameBoard(board.Keys.First());
+          gameDict.Add(i, savedGame);
           i++;
      }
 
-     Console.WriteLine("Choose one of those");
-     var choice = Console.ReadLine();
-     var isNum = Int32.TryParse(choice, out var integerChoice);
-     if (!isNum || !boardMap.ContainsKey(integerChoice))
+     Console.WriteLine("Choose a game you want to delete. If you dont want to delete a game choose 'X'");
+     var userChoice = Console.ReadLine();
+     if (userChoice == "X")
      {
-          LoadNewGame();
+          return "B";
+     }
+
+     if (!int.TryParse(userChoice, out var a) || !gameDict.ContainsKey(a))
+     {
+          DeleteSavedGame();
      }
      else
      {
-          game.SetGameBoard(stateRepositoryFileSystem.GetGameState(boardMap[Int32.Parse(choice!)]));
-          UI.DrawGameBoard(game.GetBoard());
-          game = new CheckersBrain(gameOptions);
-          WaitForUserInput();
+          repo.DeleteGameState(gameDict[a]);
+     }
+     return "B";
+}
+string LoadGame()
+{
+     var allSavedGames = repo.GetGameBoardNames();
+     var i = 1;
+     var gameDict = new Dictionary<int, string>();
+     foreach (var savedGame in allSavedGames)
+     {
+          Console.WriteLine($"{i}) - {savedGame}");
+          Console.WriteLine($"Options : {repo.GetGameOptions(repo.GetGameBoard(savedGame).Values.First())}");
+          var board = repo.GetGameBoard(savedGame);
+          UI.DrawGameBoard(board.Keys.First());
+          gameDict.Add(i, savedGame);
+          i++;
      }
 
+     Console.WriteLine("Choose the game you want to load");
+     var userChoice = Console.ReadLine();
+     if (!int.TryParse(userChoice, out var a))
+     {
+          LoadGame();
+     }
+     else
+     {
+          if (!gameDict.ContainsKey(int.Parse(userChoice)))
+          {
+               LoadGame();
+          }
+          else
+          {
+               var gameToBeLoaded = repo.GetGameBoard(gameDict[a]);
+               gameOptions = repo.GetGameOptions(gameToBeLoaded.Values.First());
+               Console.WriteLine($"Game opt - {repo.GetGameOptions(gameToBeLoaded.Values.First())}");
+               
+               UI.DrawGameBoard(gameToBeLoaded.Keys.First());
+               
+               // Not implemented yet
+               game.PlayGame();
+          }
+
+     }
+     WaitForUserInput();
      return "B";
 }
 
@@ -89,35 +162,85 @@ string LoadNewGame()
 string DoNewGame()
 {
      Console.Clear();
-     Console.WriteLine("\nNew game! Time to play!");
+     Console.WriteLine("\nNew game! Time to play!\n");
+     Console.WriteLine("You want to load custom options?");
      game = new CheckersBrain(gameOptions);
      UI.DrawGameBoard(game.GetBoard());
+     // Gameplay will be implemented here.
+     game.PlayGame();
+
+
+     OfferSaving();
      WaitForUserInput();
 
 
-     #region Use this code for changing checker positions. For testing saving functionaity
-
-     // // For testing game saving functionality
-     // game.ChangeCheckerPos(0,0,6,5);
-     // //for testing game saving functionality
-     // UI.DrawGameBoard(game.GetBoard());
-     // Console.WriteLine("filename");
-     // var fileName = Console.ReadLine();
-     // stateRepositoryFileSystem.SaveGameState(fileName!, game.GetBoard());
-
-     #endregion
-     
-     WaitForUserInput();
      return "B";
 }
 
+
+void OfferSaving()
+{
+     Console.WriteLine("Do you want to save current game? Press enter to save and any other button to deny.");
+     var key = Console.ReadKey(true).Key;
+     if (key == Enter)
+     {
+
+          var foundSutableOpiton = false;
+          var sutableOption = "";
+          var optionsList = repo.GetGameOptionsList();
+          foreach (var option in optionsList)
+          {
+               if (!repo.GetGameOptions(option).Equals(gameOptions)) continue;
+               foundSutableOpiton = true;
+               sutableOption = option;
+               Console.WriteLine($"Sutable option --- {sutableOption}");
+               break;
+
+          }
+          if (optionsList.Contains(gameOptions.Name))
+          {
+               
+               Console.WriteLine("Please choose a name for current game");
+               var userChoice = Console.ReadLine();
+               
+               repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
+          }
+          else
+          {
+               if (foundSutableOpiton)
+               {
+                    Console.WriteLine("Looks that you are not using any saved game options. \n" +
+                                      $"Current options are same as '{sutableOption}'");
+                    Console.WriteLine("Game will be saved with this option");
+                    Console.WriteLine("\nPlease choose a name for current game");
+                    var userChoice = Console.ReadLine();
+                    gameOptions.Name = sutableOption;
+                    repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
+
+                    
+               }
+               else
+               {
+                    
+                    // If no sutable option found, then use userChoice+AutoSave as current game option
+                    Console.WriteLine("Please choose a name for current game");
+                    var userChoice = Console.ReadLine();
+                    gameOptions.Name = userChoice + "AutoSave";
+                    repo.SaveGameOptions(gameOptions.Name, gameOptions);
+                    repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
+               }
+              
+
+          }
+     }
+}
 
 // Run delete options submenu. Delete one of them or exit this menu
 string DeleteOptions()
 {
      var optionToDelete = RunSubmenu();
      if (optionToDelete == "B" ||  optionToDelete == "M" || optionToDelete == "X") return optionToDelete;
-     repositoryFileSystem.DeleteGameOptions(optionToDelete);
+     repo.DeleteGameOptions(optionToDelete);
      Console.Clear();
      Console.WriteLine("Deleted");
      WaitForUserInput();
@@ -129,15 +252,17 @@ string DeleteOptions()
 string SaveCurrentOptions()
 {
      
+     
+     
      Console.Clear();
      Console.WriteLine("Current game option:");
      Console.WriteLine(gameOptions);
-
      Console.CursorVisible = true;
      Console.WriteLine("How would you like to name this game option?");
      var userInputForFileName = Console.ReadLine();
+     gameOptions.Name = userInputForFileName!;
      
-     repositoryFileSystem.SaveGameOptions(userInputForFileName!, gameOptions);
+     repo.SaveGameOptions(userInputForFileName!, gameOptions);
      Console.CursorVisible = false;
      Console.WriteLine("Game options saved!");
      WaitForUserInput();
@@ -163,8 +288,8 @@ string LoadGameOptions()
 {
      
      var optionToLoad = RunSubmenu();
-     if (optionToLoad == "B" ||  optionToLoad == "M" || optionToLoad == "X") return optionToLoad;
-     gameOptions = repositoryFileSystem.GetGameOptions(optionToLoad);
+     if (optionToLoad is "B" or "M" or "X") return optionToLoad;
+     gameOptions = repo.GetGameOptions(optionToLoad);
      Console.Clear();
      Console.WriteLine("Loaded!");
      WaitForUserInput();
@@ -181,10 +306,10 @@ string RunSubmenu()
      var listOfOptions = new List<string>();
      
      // For each option choice shortcut is a number in string form, other shortcuts are standard
-     foreach (var gameOption in repositoryFileSystem.GetGameOptionsList())
+     foreach (var gameOption in repo.GetGameOptionsList())
      {
           menuItems.Add(new MenuItem(i.ToString(), 
-               gameOption + ":\t" + repositoryFileSystem.GetGameOptions(gameOption), 
+               gameOption + ":\t" + repo.GetGameOptions(gameOption), 
                null));
           listOfOptions.Add(gameOption);
           i++;
@@ -197,7 +322,7 @@ string RunSubmenu()
      
      // If user choice is number then return user choice return one of the options that he has chose.
      // Else return  user choice
-     return !Int32.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j];
+     return !int.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j];
 }
 
 
@@ -290,12 +415,12 @@ string PrintCurrentGameOptions()
 
 void PrintOutAllSavedGameOptions()
 {
-     var optionsList = repositoryFileSystem.GetGameOptionsList();
+     var optionsList = repo.GetGameOptionsList();
      var i = 1;
      foreach (var option in optionsList)
      {
           Console.WriteLine(i + ") " + option);
-          Console.WriteLine(repositoryFileSystem.GetGameOptions(option));
+          Console.WriteLine(repo.GetGameOptions(option));
           i++;
      }
 }
