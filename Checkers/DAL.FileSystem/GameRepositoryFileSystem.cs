@@ -16,6 +16,8 @@ public class GameRepositoryFileSystem : IGameRepository
                                           Path.DirectorySeparatorChar + "options";
     private readonly string _stateDir = "." + 
                                           Path.DirectorySeparatorChar + "GameSave";
+
+    public string SavedGameOptionsFlag = "OptionsForGame";
     // List of all saved game opions
     public List<string> GetGameOptionsList()
     {
@@ -76,28 +78,30 @@ public class GameRepositoryFileSystem : IGameRepository
 
     
     // Returns dict where key is game board and value is game options
-    public Dictionary<EGameSquareState[,], string> GetGameBoard(string id)
+    public Dictionary<EGameSquareState[,], GameOptions> GetGameBoard(string id)
     {
         var fileContent = File.ReadAllText(_funcs.GetFileName(id, _stateDir));
         var boardAndGameOptionName = JsonSerializer.Deserialize<Dictionary<string, EGameSquareState[][]>>(fileContent);
-        var convertedBoard = _funcs.JaggedTo2D<EGameSquareState>(boardAndGameOptionName!.Values.First());
+        var convertedBoard = _funcs.JaggedTo2D(boardAndGameOptionName!.Values.First());
         if (boardAndGameOptionName == null)
         {
             throw new NullReferenceException($"Could not deserialize: {fileContent}");
         }
 
-        var ret = new Dictionary<EGameSquareState[,], string> { { convertedBoard, boardAndGameOptionName.Keys.First() } };
+        var ret = new Dictionary<EGameSquareState[,], GameOptions> { { convertedBoard, GetGameOptions(boardAndGameOptionName.Keys.First()) } };
         return ret;
     }
 
     
     // Save Dict where key is jagged game board and value is options filename
-    public void SaveGameState(string id, EGameSquareState[,] board, string options)
+    public void SaveGameState(string id, EGameSquareState[,] board, GameOptions options)
     {
-        _funcs.CheckOrCreateDirectory(_optionsDir);
+        _funcs.CheckOrCreateDirectory(_stateDir);
         var jaggedBoard = _funcs.ToJaggedArray(board);
         var dict = new Dictionary<string, EGameSquareState[][]>();
-        dict.Add(options, jaggedBoard);
+        options.Name = options.Name + SavedGameOptionsFlag;
+        SaveGameOptions(options.Name, options);
+        dict.Add(options.Name, jaggedBoard);
         var fileContent = JsonSerializer.Serialize(dict);
         File.WriteAllText(_funcs.GetFileName(id, _stateDir), fileContent);
 

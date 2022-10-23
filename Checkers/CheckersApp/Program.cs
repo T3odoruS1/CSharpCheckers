@@ -88,9 +88,9 @@ string DeleteSavedGame(){
      var gameDict = new Dictionary<int, string>();
      foreach (var savedGame in allSavedGames)
      {
-          Console.WriteLine($"{i}) - {savedGame}");
-          Console.WriteLine($"Options : {repo.GetGameOptions(repo.GetGameBoard(savedGame).Values.First())}");
           var board = repo.GetGameBoard(savedGame);
+          Console.WriteLine($"{i}) - {savedGame}");
+          Console.WriteLine($"Options : {board.Values.First()}");
           UI.DrawGameBoard(board.Keys.First());
           gameDict.Add(i, savedGame);
           i++;
@@ -120,9 +120,9 @@ string LoadGame()
      var gameDict = new Dictionary<int, string>();
      foreach (var savedGame in allSavedGames)
      {
-          Console.WriteLine($"{i}) - {savedGame}");
-          Console.WriteLine($"Options : {repo.GetGameOptions(repo.GetGameBoard(savedGame).Values.First())}");
           var board = repo.GetGameBoard(savedGame);
+          Console.WriteLine($"{i}) - {savedGame}");
+          Console.WriteLine($"Options : {board.Values.First()}");
           UI.DrawGameBoard(board.Keys.First());
           gameDict.Add(i, savedGame);
           i++;
@@ -143,8 +143,7 @@ string LoadGame()
           else
           {
                var gameToBeLoaded = repo.GetGameBoard(gameDict[a]);
-               gameOptions = repo.GetGameOptions(gameToBeLoaded.Values.First());
-               Console.WriteLine($"Game opt - {repo.GetGameOptions(gameToBeLoaded.Values.First())}");
+               gameOptions = gameToBeLoaded.Values.First();
                
                UI.DrawGameBoard(gameToBeLoaded.Keys.First());
                
@@ -185,53 +184,24 @@ void OfferSaving()
      if (key == Enter)
      {
 
-          var foundSutableOpiton = false;
-          var sutableOption = "";
-          var optionsList = repo.GetGameOptionsList();
-          foreach (var option in optionsList)
+          var allSavedGames = repo.GetGameBoardNames();
+          
+          Console.WriteLine("Please choose a name for current game");
+          var userChoice = Console.ReadLine();
+          if (!allSavedGames.Contains(userChoice!))
           {
-               if (!repo.GetGameOptions(option).Equals(gameOptions)) continue;
-               foundSutableOpiton = true;
-               sutableOption = option;
-               Console.WriteLine($"Sutable option --- {sutableOption}");
-               break;
-
-          }
-          if (optionsList.Contains(gameOptions.Name))
-          {
-               
-               Console.WriteLine("Please choose a name for current game");
-               var userChoice = Console.ReadLine();
-               
-               repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
+               gameOptions.Name = userChoice!;
+               repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions);
           }
           else
           {
-               if (foundSutableOpiton)
-               {
-                    Console.WriteLine("Looks that you are not using any saved game options. \n" +
-                                      $"Current options are same as '{sutableOption}'");
-                    Console.WriteLine("Game will be saved with this option");
-                    Console.WriteLine("\nPlease choose a name for current game");
-                    var userChoice = Console.ReadLine();
-                    gameOptions.Name = sutableOption;
-                    repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
-
-                    
-               }
-               else
-               {
-                    
-                    // If no sutable option found, then use userChoice+AutoSave as current game option
-                    Console.WriteLine("Please choose a name for current game");
-                    var userChoice = Console.ReadLine();
-                    gameOptions.Name = userChoice + "AutoSave";
-                    repo.SaveGameOptions(gameOptions.Name, gameOptions);
-                    repo.SaveGameState(userChoice!, game.GetBoard(), gameOptions.Name);
-               }
-              
-
+               var prevChoice = userChoice;
+               Console.WriteLine("That game name is already taken. Chose another one or press enter to rewrite that game.");
+               userChoice = Console.ReadLine();
+               gameOptions.Name = prevChoice!;
+               repo.SaveGameState(userChoice == "" ? prevChoice! : userChoice!, game.GetBoard(), gameOptions);
           }
+               
      }
 }
 
@@ -308,6 +278,7 @@ string RunSubmenu()
      // For each option choice shortcut is a number in string form, other shortcuts are standard
      foreach (var gameOption in repo.GetGameOptionsList())
      {
+          if(gameOption.Contains(repo.SavedGameOptionsFlag)) continue;
           menuItems.Add(new MenuItem(i.ToString(), 
                gameOption + ":\t" + repo.GetGameOptions(gameOption), 
                null));
@@ -419,6 +390,7 @@ void PrintOutAllSavedGameOptions()
      var i = 1;
      foreach (var option in optionsList)
      {
+          if (option.Contains(repo.SavedGameOptionsFlag)) continue;
           Console.WriteLine(i + ") " + option);
           Console.WriteLine(repo.GetGameOptions(option));
           i++;

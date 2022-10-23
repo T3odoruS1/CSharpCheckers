@@ -35,10 +35,10 @@ public interface IGameRepository
 
     
     // Get game board by string name
-    Dictionary<EGameSquareState[,], string> GetGameBoard(string id);
+    Dictionary<EGameSquareState[,], GameOptions> GetGameBoard(string id);
 
     // Sava game board
-    void SaveGameState(string id, EGameSquareState[,] board, string options);
+    void SaveGameState(string id, EGameSquareState[,] board, GameOptions options);
 
     
     // Delete game board
