@@ -1,6 +1,6 @@
 namespace MenuSystem;
 
-    public class ConsoleHelper
+    public static class ConsoleHelper
 {
     public static string MultipleChoice(bool canCancel, string title, params string[] options)
     {

@@ -54,7 +54,6 @@ public class Menu
 
             }
             _userChoice = GetNewUserInput();
-            var i = 0;
             if (_menuItems.ContainsKey(_userChoice))
                 
             {
@@ -63,7 +62,7 @@ public class Menu
                     methodReturnValue = _menuItems[_userChoice].MethodToRun!();
                 }
                 
-                if (_userChoice == ShortcutGoBack || Int32.TryParse(_userChoice, out i))
+                if (_userChoice == ShortcutGoBack || Int32.TryParse(_userChoice, out _))
                 {
                     _menuDone = true;
                 }

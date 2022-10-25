@@ -5,10 +5,6 @@ namespace DataAccessLayer;
 
 public interface IGameRepository
 {
-    // crud methods
-
-    
-    
     // For game options
     
     // Read all game Options and return their filenames

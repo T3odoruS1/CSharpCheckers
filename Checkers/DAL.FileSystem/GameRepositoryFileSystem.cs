@@ -17,9 +17,10 @@ public class GameRepositoryFileSystem : IGameRepository
     private readonly string _stateDir = "." + 
                                           Path.DirectorySeparatorChar + "GameSave";
 
-    public string SavedGameOptionsFlag = "OptionsForGame";
+    public const string SavedGameOptionsFlag = "OptionsForGame";
 
-    public string LastUsedToken = "LastLoaded";
+    public const string LastUsedToken = "LastLoaded";
+
     // List of all saved game opions
     public List<string> GetGameOptionsList()
     {
