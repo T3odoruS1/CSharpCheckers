@@ -58,7 +58,7 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 try
 {
-     gameOptions = repo.GetGameOptions("LastLoaded");
+     gameOptions = repo.GetGameOptions(repo.LastUsedToken);
 
 }
 catch (Exception)
@@ -68,7 +68,7 @@ catch (Exception)
 
 mainMenu.RunMenu();
 
-repo.SaveGameOptions("LastLoaded", gameOptions);
+repo.SaveGameOptions(repo.LastUsedToken, gameOptions);
 
 #endregion
 
@@ -278,7 +278,7 @@ string RunSubmenu()
      // For each option choice shortcut is a number in string form, other shortcuts are standard
      foreach (var gameOption in repo.GetGameOptionsList())
      {
-          if(gameOption.Contains(repo.SavedGameOptionsFlag)) continue;
+          if(gameOption.Contains(repo.SavedGameOptionsFlag) || gameOption.Equals(repo.LastUsedToken)) continue;
           menuItems.Add(new MenuItem(i.ToString(), 
                gameOption + ":\t" + repo.GetGameOptions(gameOption), 
                null));
@@ -390,7 +390,7 @@ void PrintOutAllSavedGameOptions()
      var i = 1;
      foreach (var option in optionsList)
      {
-          if (option.Contains(repo.SavedGameOptionsFlag)) continue;
+          if (option.Contains(repo.SavedGameOptionsFlag) || option.Equals(repo.LastUsedToken)) continue;
           Console.WriteLine(i + ") " + option);
           Console.WriteLine(repo.GetGameOptions(option));
           i++;

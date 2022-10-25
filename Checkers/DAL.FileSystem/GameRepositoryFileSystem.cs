@@ -18,6 +18,8 @@ public class GameRepositoryFileSystem : IGameRepository
                                           Path.DirectorySeparatorChar + "GameSave";
 
     public string SavedGameOptionsFlag = "OptionsForGame";
+
+    public string LastUsedToken = "LastLoaded";
     // List of all saved game opions
     public List<string> GetGameOptionsList()
     {
