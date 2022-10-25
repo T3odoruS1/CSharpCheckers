@@ -10,9 +10,9 @@ public class Menu
     private readonly EMenuLevel _level;
 
     private readonly Dictionary<string, MenuItem> _menuItems = new Dictionary<string, MenuItem>();
-    private readonly MenuItem _menuItemExit = new MenuItem(ShortcutExit, "Exit", null);
-    private readonly MenuItem _menuItemGoBack = new MenuItem(ShortcutGoBack, "Back", null);
-    private readonly MenuItem _menuItemGoToMain = new MenuItem(ShortcutGoMain, "Main menu", null);
+    private readonly MenuItem _menuItemExit = new MenuItem(ShortcutExit, "Exit 👋", null);
+    private readonly MenuItem _menuItemGoBack = new MenuItem(ShortcutGoBack, "Back 🔙", null);
+    private readonly MenuItem _menuItemGoToMain = new MenuItem(ShortcutGoMain, "Main menu 🏁", null);
     private readonly List<string> _menuItemsAsString = new List<string>();
     private bool _menuDone;
     private string _userChoice = "";

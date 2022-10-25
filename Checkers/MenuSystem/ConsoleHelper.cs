@@ -4,10 +4,10 @@ namespace MenuSystem;
 {
     public static string MultipleChoice(bool canCancel, string title, params string[] options)
     {
-        const int startX = 1;
-        const int startY = 1;
-        const int optionsPerLine = 1;
-        const int spacingPerLine = 14;
+        const int startX = 5;
+        const int startY = 5;
+        const int optionsPerLine = 2;
+        const int spacingPerLine = 33;
 
         var currentSelection = 0;
 
@@ -27,7 +27,7 @@ namespace MenuSystem;
                 Console.SetCursorPosition(startX + (i % optionsPerLine) * spacingPerLine, startY + i / optionsPerLine);
 
                 if(i == currentSelection)
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
 
                 Console.Write(options[i]);
 

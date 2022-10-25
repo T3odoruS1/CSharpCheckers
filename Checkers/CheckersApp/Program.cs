@@ -18,35 +18,35 @@ gameOptions.Name = "Default";
 
 
 var thirdMenu = new Menu(EMenuLevel.Other,
-     ">  Checkers third level  <",
+     "          > =◉= Checkers third level =◉= <",
      new List<MenuItem>()
      {
-          new MenuItem("N", "Easter egg", EasterEggMethod),
+          new MenuItem("N", "Easter egg 💀", EasterEggMethod),
      });
 var secondMenu = new Menu(EMenuLevel.Second,
-     ">  Checkers options  <",
+     "          > =◉= Checkers options =◉= <",
      new List<MenuItem>()
 {
-     new MenuItem("N", "Current Game Options", PrintCurrentGameOptions),
-     new MenuItem("C", "Create options", CreateGameOptions),
-     new MenuItem("O", "List saved options", ListGameOptions),
-     new MenuItem("L", "Load options", LoadGameOptions),
-     new MenuItem("D", "Delete options", DeleteOptions),
-     new MenuItem("S", "Save current options", SaveCurrentOptions),
-     new MenuItem("T", "Something to be found here ;)", thirdMenu.RunMenu)
+     new MenuItem("N", "Current Game Options 🤔", PrintCurrentGameOptions),
+     new MenuItem("C", "Create options 📝", CreateGameOptions),
+     new MenuItem("O", "List saved options 📁", ListGameOptions),
+     new MenuItem("L", "Load options 💿", LoadGameOptions),
+     new MenuItem("D", "Delete options ❌", DeleteOptions),
+     new MenuItem("S", "Save current options 💾️", SaveCurrentOptions),
+     new MenuItem("T", "Something to be found here 😉", thirdMenu.RunMenu)
 
 });
 
 
 var mainMenu = new Menu(EMenuLevel.Main,
-     ">  Checkers  <",
+     "          > =◉= CHECKERS =◉= <",
      new List<MenuItem>()
      {
-          new MenuItem("N", "New Game", DoNewGame),
-          new MenuItem("L", "Load Game", LoadGame),
-          new MenuItem("D", "Delete SavedGame", DeleteSavedGame),
+          new MenuItem("N", "New Game 🎮", DoNewGame),
+          new MenuItem("L", "Load Game 💿", LoadGame),
+          new MenuItem("D", "Delete SavedGame ❌", DeleteSavedGame),
 
-          new MenuItem("O", "Options", secondMenu.RunMenu)
+          new MenuItem("O", "Options ⚙️", secondMenu.RunMenu)
      });
 
 #endregion
@@ -209,7 +209,7 @@ void OfferSaving()
 string DeleteOptions()
 {
      var optionToDelete = RunSubmenu();
-     if (optionToDelete == "B" ||  optionToDelete == "M" || optionToDelete == "X") return optionToDelete;
+     if (optionToDelete is "B" or "M" or "X") return optionToDelete;
      repo.DeleteGameOptions(optionToDelete);
      Console.Clear();
      Console.WriteLine("Deleted");
