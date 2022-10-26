@@ -22,7 +22,6 @@ Such functions as player names, stack of game states, timestamps will be impleme
 var dbOptions = new DbContextOptionsBuilder<AppDbContext>()
 .UseSqlite("Data Source=/Users/edgarvildt/Developer/CheckerDb/checker.db").Options;
 var ctx = new AppDbContext(dbOptions);
-var repoDb = new GameRepository(ctx);
 
 
 var lastUsedRepoFs = new GameOptionsLastUsedFileSystem();
@@ -30,12 +29,14 @@ var lastUsedRepoFs = new GameOptionsLastUsedFileSystem();
 var lastUsedRepo = lastUsedRepoFs;
 
 var gameRepoFs = new GameRepositoryFileSystem();
+var gameRepoDb = new GameRepositoryDatabase(ctx);
 
-var gameRepo = gameRepoFs;
+var gameRepo = gameRepoDb;
 
 var optionRepoFs = new GameOptionsRepositoryFileSystem();
+var optionsRepoDb = new GameOptionsRepositoryDatabase(ctx);
 
-var optionRepo = optionRepoFs;
+var optionRepo = optionsRepoDb;
 
 
 CheckersBrain checkersBrain;
@@ -148,7 +149,11 @@ string DeleteSavedGame()
      }
      else
      {
+          var gameToDelete = gameRepo.GetGame(gameDict[a]);
+          var opt = gameToDelete.GameOptions!.GameCount--;
+          optionRepo.UpdateGameOptions(gameToDelete.GameOptions);
           gameRepo.DeleteGameByName(gameDict[a]);
+          
      }
      return "B";
 }
@@ -233,6 +238,7 @@ string DoNewGame()
           GameOptions = gameOptions
      };
 
+     // newGame.OptionsId = gameOptions.Id;
      string gameName;
 
      do
@@ -383,9 +389,15 @@ string SaveCurrentOptions()
      Console.CursorVisible = true;
      Console.WriteLine("How would you like to name this game option? You should choose a name that is not already used.");
      Console.WriteLine("Hint: Taken names:");
-     foreach (var opt in optionRepo.GetGameOptionsList())
+     if (optionRepo.GetGameOptionsList().Count != 0)
      {
-          Console.WriteLine(optionRepo.GetGameOptions(opt).Name);
+          foreach (var opt in optionRepo.GetGameOptionsList())
+          {
+
+               Console.WriteLine(opt);
+               Console.WriteLine(optionRepo.GetGameOptions(opt).Name);
+
+          }
      }
 
      string userInputForFileName;
@@ -473,10 +485,13 @@ string RunSubmenu()
 string CreateGameOptions()
 {
      Console.Clear();
+     gameOptions = new CheckerGameOptions
+     {
+          Name = ""
+     };
      ValidateUserGameOptions();
-     gameOptions.Name = "";
-     gameOptions.CheckerGames = new List<CheckerGame>();
      Console.WriteLine("Alright this is your new game options:");
+     gameOptions.GameCount = 0;
      Console.WriteLine(gameOptions);
      WaitForUserInput();
 

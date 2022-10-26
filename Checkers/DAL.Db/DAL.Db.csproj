@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\DAL.FileSystem\DAL.FileSystem.csproj" />
       <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
       <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>

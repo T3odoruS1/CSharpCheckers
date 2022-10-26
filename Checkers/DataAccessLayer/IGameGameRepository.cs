@@ -33,4 +33,6 @@ public interface IGameGameRepository
     
     // Delete game from system by provided name
     void DeleteGameByName(string name);
+
+    public bool GameNameAvailable(string name);
 }

@@ -23,4 +23,6 @@ public interface IGameOptionRepository
     void DeleteGameOptions(string optionName);
 
     void UpdateGameOptions(CheckerGameOptions options);
+
+    public bool OptionNameAvailable(string name);
 }

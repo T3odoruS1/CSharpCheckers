@@ -6,6 +6,8 @@ public static class FsHelpers
     private const string FileExtension = "json";
 
     public const string FileSystemIdentifier = "FS";
+
+    public const string DatabaseIdentifier = "DB";
     
     
     
