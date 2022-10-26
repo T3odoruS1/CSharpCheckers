@@ -3,6 +3,7 @@ using System.Text.Json;
 using ConsoleUI;
 using DAL.Db;
 using DAL.FileSystem;
+using DataAccessLayer;
 using Domain;
 using GameBrain;
 using MenuSystem;
@@ -28,13 +29,13 @@ var lastUsedRepoFs = new GameOptionsLastUsedFileSystem();
 
 var lastUsedRepo = lastUsedRepoFs;
 
-var gameRepoFs = new GameRepositoryFileSystem();
-var gameRepoDb = new GameRepositoryDatabase(ctx);
+IGameGameRepository gameRepoFs = new GameRepositoryFileSystem();
+IGameGameRepository gameRepoDb = new GameRepositoryDatabase(ctx);
 
 var gameRepo = gameRepoDb;
 
-var optionRepoFs = new GameOptionsRepositoryFileSystem();
-var optionsRepoDb = new GameOptionsRepositoryDatabase(ctx);
+IGameOptionRepository optionRepoFs = new GameOptionsRepositoryFileSystem();
+IGameOptionRepository optionsRepoDb = new GameOptionsRepositoryDatabase(ctx);
 
 var optionRepo = optionsRepoDb;
 
@@ -65,6 +66,7 @@ var secondMenu = new Menu(EMenuLevel.Second,
      new MenuItem("L", "Load options 💿", LoadGameOptions),
      new MenuItem("D", "Delete options ❌", DeleteOptions),
      new MenuItem("S", "Save current options 💾️", SaveCurrentOptions),
+     new MenuItem("P", "Change data saving method", ChangeRepoType),
      new MenuItem("T", "Something to be found here 😉", thirdMenu.RunMenu)
 
 });
@@ -114,6 +116,33 @@ lastUsedRepo.NoteLastUsedOption(gameOptions.Name);
 // Print out all game options and load one that user chooses.
 
 
+string ChangeRepoType()
+{
+     Console.Clear();
+
+     if (gameRepo.Name == FsHelpers.DatabaseIdentifier)
+     {
+          gameRepo = gameRepoFs;
+          Console.WriteLine("Changed from Database to Filesystem");
+     }else if (gameRepo.Name == FsHelpers.FileSystemIdentifier)
+     {
+          gameRepo = gameRepoDb;
+          Console.WriteLine("Changed from Filesystem to Database");
+     }
+
+     if (optionRepo.Name == FsHelpers.DatabaseIdentifier)
+     {
+          optionRepo = optionRepoFs;
+     }else if (optionRepo.Name == FsHelpers.FileSystemIdentifier)
+     {
+          optionRepo = optionsRepoDb;
+     }
+     WaitForUserInput();
+
+     
+     return "B";
+}
+
 string DeleteSavedGame()
 {
      Console.Clear();
@@ -137,7 +166,7 @@ string DeleteSavedGame()
      }
 
      Console.WriteLine("Choose a game you want to delete. If you dont want to delete a game choose 'X'");
-     var userChoice = Console.ReadLine();
+     var userChoice = Console.ReadLine()!.ToUpper().Trim();
      if (userChoice == "X")
      {
           return "B";
