@@ -1,15 +1,17 @@
 namespace DAL.FileSystem;
 
-public class UniversalFunctionsForFileSystem
+public static class FsHelpers
 {
     
     private const string FileExtension = "json";
+
+    public const string FileSystemIdentifier = "FS";
     
     
     
     // Universal methods for saving boards and game options into json
     
-    public void CheckOrCreateDirectory(string optionsDir)
+    public static void CheckOrCreateDirectory(string optionsDir)
     {
         if (!Directory.Exists(optionsDir))
         {
@@ -18,7 +20,7 @@ public class UniversalFunctionsForFileSystem
     }
     
     
-    public string GetFileName(string id, string optionsDir)
+    public static string GetFileName(string id, string optionsDir)
     
         // id - filename
     {
@@ -31,7 +33,7 @@ public class UniversalFunctionsForFileSystem
     
     
      // Method is used to convert 2d into jagged arrays. Needed for json serialization
-     public T[][] ToJaggedArray<T>( T[,] twoDimensionalArray)
+     public static T[][] ToJaggedArray<T>( T[,] twoDimensionalArray)
      {
          var rowsFirstIndex = twoDimensionalArray.GetLowerBound(0);
          var rowsLastIndex = twoDimensionalArray.GetUpperBound(0);
@@ -56,7 +58,7 @@ public class UniversalFunctionsForFileSystem
      
      
      // Used to convert jagged arrays into 2d. We get jagged form json, so it is necessary to convert
-     public T[,] JaggedTo2D<T>(T[][] source)
+     public static T[,] JaggedTo2D<T>(T[][] source)
      {
          try
          {
@@ -75,6 +77,8 @@ public class UniversalFunctionsForFileSystem
              throw new InvalidOperationException("The given jagged array is not rectangular.");
          } 
      }
+
+     
      
 
 }

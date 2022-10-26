@@ -1,9 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain;
 
-public class GameOptions
+public class CheckerGameOptions
 {
     public int Id { get; set; }
     
+    [MaxLength(128)]
     public string Name { get; set; } = default!;
     public int Width { get; set; } = 8;
     public int Height { get; set; } = 8;
@@ -12,28 +16,16 @@ public class GameOptions
 
     public ICollection<CheckerGame>? CheckerGames { get; set; }
 
+    public int GameCount { get; set; } = 0;
+
     public override string ToString()
     {
-        return $"Board width: {Width}, Board height: {Height}, Taking is mandatory: {TakingIsMandatory}, White starts: {WhiteStarts}";
+        return $"Options name: {Name}, \n" +
+               $"Board width: {Width}, \n" +
+               $"Board height: {Height}, \n" +
+               $"Taking is mandatory: {TakingIsMandatory}, \n" +
+               $"White starts: {WhiteStarts} \n" +
+               $"Amount of games: {GameCount}";
     }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is not GameOptions)
-        {
-            return false;
-        }
-
-        var comparable = (GameOptions)obj;
-        if (comparable.Width == this.Width &&
-            comparable.Height == this.Height &&
-            comparable.TakingIsMandatory == this.TakingIsMandatory &&
-            comparable.WhiteStarts == this.WhiteStarts)
-        {
-            return true;
-        }
-
-        return false;
-
-    }
+    
 }

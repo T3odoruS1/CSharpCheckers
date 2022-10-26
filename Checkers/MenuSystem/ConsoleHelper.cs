@@ -6,9 +6,16 @@ namespace MenuSystem;
     {
         const int startX = 5;
         const int startY = 5;
-        const int optionsPerLine = 2;
+        var optionsPerLine = 2;
         const int spacingPerLine = 33;
 
+        foreach (var element in options)
+        {
+            if (element.Length <= 35) continue;
+            optionsPerLine = 1;
+            break;
+        }
+        
         var currentSelection = 0;
 
         ConsoleKey key;

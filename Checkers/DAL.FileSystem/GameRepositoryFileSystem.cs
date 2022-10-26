@@ -1,117 +1,94 @@
+using System.Text.Json;
 using DataAccessLayer;
 using Domain;
-using System.Text.Json;
-using GameBrain;
-
 
 namespace DAL.FileSystem;
 
-public class GameRepositoryFileSystem : IGameRepository
+public class GameRepositoryFileSystem : IGameGameRepository
 {
-
     private const string FileExtension = "json";
-    private readonly UniversalFunctionsForFileSystem _funcs = new UniversalFunctionsForFileSystem();
-
-    private readonly string _optionsDir = "." + 
-                                          Path.DirectorySeparatorChar + "options";
-    private readonly string _stateDir = "." + 
-                                          Path.DirectorySeparatorChar + "GameSave";
-
-    public const string SavedGameOptionsFlag = "OptionsForGame";
-
-    public const string LastUsedToken = "LastLoaded";
-
-    // List of all saved game opions
-    public List<string> GetGameOptionsList()
+    private readonly string _gameDir = "." + 
+                                        Path.DirectorySeparatorChar + "gameSaves";
+    
+    // File system repo identifier
+    public string Name { get; set; } = FsHelpers.FileSystemIdentifier;
+    
+    
+    
+    public List<string> GetAllGameNameList()
     {
-        _funcs.CheckOrCreateDirectory(_optionsDir);
+        FsHelpers.CheckOrCreateDirectory(_gameDir);
         var res = new List<string>();
         foreach (var fileName in Directory.GetFileSystemEntries(
-                     _optionsDir, "*" + FileExtension))
+                     _gameDir, "*" + FileExtension))
         {
             res.Add(Path.GetFileNameWithoutExtension(fileName));
         }
-
         return res;
     }
-    
-    // Get particular game option by file name
-    public GameOptions GetGameOptions(string id)
-    
-    // id - filename
-    {
-        var fileContent = File.ReadAllText(_funcs.GetFileName(id, _optionsDir));
-        var options = JsonSerializer.Deserialize<GameOptions>(fileContent);
 
-        if (options == null)
+    public CheckerGame GetGame(string name)
+    {
+        var fileContent = File.ReadAllText(FsHelpers.GetFileName(name, _gameDir));
+        var checkerGame = JsonSerializer.Deserialize<CheckerGame>(fileContent);
+        var optionName = checkerGame!.GameOptions!.Name;
+        var optionsRepo = new GameOptionsRepositoryFileSystem();
+        checkerGame.GameOptions = optionsRepo.GetGameOptions(optionName);
+        if (checkerGame == null)
         {
             throw new NullReferenceException($"Could not deserialize: {fileContent}");
         }
 
-        return options;
+        return checkerGame;
     }
 
     
-    // Save game option into json file
-    public void SaveGameOptions(string id, GameOptions options)
-    
-    // id - filename
+    // Save game. Throws exception if game name is already taken
+    public void SavaGame(CheckerGame game)
     {
-        _funcs.CheckOrCreateDirectory(_optionsDir);
-        var fileContent = JsonSerializer.Serialize(options);
-        File.WriteAllText(_funcs.GetFileName(id, _optionsDir), fileContent);
-    }
-    public void DeleteGameOptions(string id)
-    {
-        File.Delete(_funcs.GetFileName(id, _optionsDir));
-    }
-
-    public List<string> GetGameBoardNames()
-    {
-        _funcs.CheckOrCreateDirectory(_stateDir);
-        var res = new List<string>();
-        foreach (var fileName in Directory.GetFileSystemEntries(
-                     _stateDir, "*" + FileExtension))
+        
+        // For updating separate function
+        if (!GameNameAvailable(game.Name))
         {
-            res.Add(Path.GetFileNameWithoutExtension(fileName));
+            throw new ArgumentException($"You provided a new game with name {game.Name}. This game name is taken. Choose another.");
         }
-
-        return res;
+        FsHelpers.CheckOrCreateDirectory(_gameDir);
+        var fileContent = JsonSerializer.Serialize(game);
+        File.WriteAllText(FsHelpers.GetFileName(game.Name, _gameDir), fileContent);
     }
 
     
-    // Returns dict where key is game board and value is game options
-    public Dictionary<EGameSquareState[,], GameOptions> GetGameBoard(string id)
+    // Update game. Same as SaveGame but doesn't throw exception then name is taken.
+    // !!! Not tested yet. !!!
+    // TODO test when gameplay is implemented
+    public void UpdateGame(CheckerGame game)
     {
-        var fileContent = File.ReadAllText(_funcs.GetFileName(id, _stateDir));
-        var boardAndGameOptionName = JsonSerializer.Deserialize<Dictionary<string, EGameSquareState[][]>>(fileContent);
-        var convertedBoard = _funcs.JaggedTo2D(boardAndGameOptionName!.Values.First());
-        if (boardAndGameOptionName == null)
-        {
-            throw new NullReferenceException($"Could not deserialize: {fileContent}");
-        }
+        FsHelpers.CheckOrCreateDirectory(_gameDir);
+        var fileContent = JsonSerializer.Serialize(game);
+        File.WriteAllText(FsHelpers.GetFileName(game.Name, _gameDir), fileContent);    }
 
-        var ret = new Dictionary<EGameSquareState[,], GameOptions> { { convertedBoard, GetGameOptions(boardAndGameOptionName.Keys.First()) } };
-        return ret;
+    
+    // Add new game
+    // !!! Not tested yet !!!
+    // TODO test when gameplay is implemented
+    public void AddNewGameState(CheckerGameState state)
+    {
+        var checkersGame = state.CheckerGame!;
+        checkersGame.CheckerGameStates!.Add(state);
+        UpdateGame(checkersGame);
+    }
+    
+    
+    // Delete game by its name
+    public void DeleteGameByName(string name)
+    {
+        File.Delete(FsHelpers.GetFileName(name, _gameDir));
     }
 
     
-    // Save Dict where key is jagged game board and value is options filename
-    public void SaveGameState(string id, EGameSquareState[,] board, GameOptions options)
+    // Checks if game name is already taken. Returns true if available
+    public bool GameNameAvailable(string name)
     {
-        _funcs.CheckOrCreateDirectory(_stateDir);
-        var jaggedBoard = _funcs.ToJaggedArray(board);
-        var dict = new Dictionary<string, EGameSquareState[][]>();
-        options.Name = options.Name + SavedGameOptionsFlag;
-        SaveGameOptions(options.Name, options);
-        dict.Add(options.Name, jaggedBoard);
-        var fileContent = JsonSerializer.Serialize(dict);
-        File.WriteAllText(_funcs.GetFileName(id, _stateDir), fileContent);
-
-    }
-
-    public void DeleteGameState(string id)
-    {
-        File.Delete(_funcs.GetFileName(id, _stateDir));
+        return !GetAllGameNameList().Contains(name);
     }
 }

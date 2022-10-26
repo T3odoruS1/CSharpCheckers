@@ -7,7 +7,7 @@ public class CheckersBrain
 
     private EGameSquareState[,] _gameBoard;
     
-    public CheckersBrain(GameOptions options)
+    public CheckersBrain(CheckerGameOptions options)
     {
         var boardWidth = options.Width;
         var boardHeight = options.Height;
@@ -132,8 +132,10 @@ public class CheckersBrain
 
     public void PlayGame()
     {
-        Console.WriteLine("Gameplay not implemented yet.");
+        
     }
+    
+    
     
     
     
