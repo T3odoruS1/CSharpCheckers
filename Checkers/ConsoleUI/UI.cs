@@ -1,4 +1,5 @@
 ﻿using GameBrain;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace ConsoleUI;
 
@@ -7,7 +8,7 @@ public static class UI
     
     // Main function to draw the board
     
-    public static void DrawGameBoard(EGameSquareState[,] board)
+    public static void DrawGameBoard(EGameSquareState[,] board, int? activeX, int? activeY)
     {
         var width = board.GetLength(0);
         var height = board.GetLength(1);
@@ -30,10 +31,16 @@ public static class UI
             // Iterating through the columns
             for (var j = 0; j < width; j++)
             {
-                
+
+                if (j == activeX && i == activeY)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+
+                }
                 // Switch expression to decide what to print in given cell
                 switch (board[j, i])
                 {
+                    
                     case EGameSquareState.Black :
                         Console.Write(" ◎ ");
                         break;
@@ -57,6 +64,8 @@ public static class UI
                     default:
                         throw new ArgumentException("Invalid choice for square choice: " + board[j, i]);
                 }
+                // Console.ResetColor();
+
             }
     
             Console.WriteLine();

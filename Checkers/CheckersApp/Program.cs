@@ -13,8 +13,7 @@ using static System.ConsoleKey;
 var gameOptions = new CheckerGameOptions();
 
 /*
-Full saving functionality will be implemented using db.
-Such functions as player names, stack of game states, timestamps will be implemented in db implementation 
+Gameplay not implemented yet
 
  */
 
@@ -107,15 +106,6 @@ lastUsedRepo.NoteLastUsedOption(gameOptions.Name);
 #endregion
 
 
-// UI can draw the board upto 1000 cells high and 676 cells in width.
-// I doubt that we we'll need more :)
-// Numbers must be even
-
-
-
-// Print out all game options and load one that user chooses.
-
-
 string ChangeRepoType()
 {
      Console.Clear();
@@ -160,7 +150,7 @@ string DeleteSavedGame()
                          .Last()
                          .SerializedGameBoard);
           var gameBoard = FsHelpers.JaggedTo2D(jaggedBoard!);
-          UI.DrawGameBoard(gameBoard);
+          UI.DrawGameBoard(gameBoard, null, null);
           gameDict.Add(i, savedGame);
           i++;
      }
@@ -179,7 +169,7 @@ string DeleteSavedGame()
      else
      {
           var gameToDelete = gameRepo.GetGame(gameDict[a]);
-          var opt = gameToDelete.GameOptions!.GameCount--;
+          gameToDelete.GameOptions!.GameCount--;
           optionRepo.UpdateGameOptions(gameToDelete.GameOptions);
           gameRepo.DeleteGameByName(gameDict[a]);
           
@@ -204,7 +194,7 @@ string LoadGame()
                          .Last()
                          .SerializedGameBoard);
           var gameBoard = FsHelpers.JaggedTo2D(jaggedBoard!);
-          UI.DrawGameBoard(gameBoard);
+          UI.DrawGameBoard(gameBoard, null, null);
           gameDict.Add(i, savedGame);
           i++;
      }
@@ -231,10 +221,8 @@ string LoadGame()
                          Deserialize<EGameSquareState[][]>(gameToBeLoaded
                               .CheckerGameStates!
                               .Last()
-                              .SerializedGameBoard)!));
+                              .SerializedGameBoard)!), null, null);
                
-               // Not implemented yet
-               // checkersBrain.PlayGame();
           }
      
      }

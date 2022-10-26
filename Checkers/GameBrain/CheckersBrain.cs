@@ -6,11 +6,15 @@ public class CheckersBrain
 {
 
     private EGameSquareState[,] _gameBoard;
+
+    private readonly CheckerGameOptions _checkerGameOptions;
+    private bool _gameOver = false;
     
     public CheckersBrain(CheckerGameOptions options)
     {
         var boardWidth = options.Width;
         var boardHeight = options.Height;
+        this._checkerGameOptions = options;
         // Throw exception if numbers not even
         if (boardHeight % 2 != 0 || boardWidth % 2 != 0)
         {
@@ -19,6 +23,7 @@ public class CheckersBrain
                 + boardHeight + " " + boardWidth);
         }
         _gameBoard = new EGameSquareState[boardWidth, boardHeight];
+        
         
         
         // Printing out each board line
@@ -130,15 +135,6 @@ public class CheckersBrain
         (_gameBoard[initialX, initialY], _gameBoard[newX, newY]) = (_gameBoard[newX, newY], _gameBoard[initialX, initialY]);
     }
 
-    public void PlayGame()
-    {
-        
-    }
-    
-    
-    
-    
-    
-    
-    
+
+
 }
