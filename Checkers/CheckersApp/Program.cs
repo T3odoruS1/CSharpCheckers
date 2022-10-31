@@ -63,9 +63,9 @@ var secondMenu = new Menu(EMenuLevel.Second,
      new MenuItem("C", "Create options 📝", CreateGameOptions),
      new MenuItem("O", "List saved options 📁", ListGameOptions),
      new MenuItem("L", "Load options 💿", LoadGameOptions),
-     new MenuItem("D", "Delete options ❌", DeleteOptions),
+     new MenuItem("D", "Delete options 🗑️", DeleteOptions),
      new MenuItem("S", "Save current options 💾️", SaveCurrentOptions),
-     new MenuItem("P", "Change data saving method", ChangeRepoType),
+     new MenuItem("P", "Change data saving method 🔄", ChangeRepoType),
      new MenuItem("T", "Something to be found here 😉", thirdMenu.RunMenu)
 
 });
@@ -77,7 +77,7 @@ var mainMenu = new Menu(EMenuLevel.Main,
      {
           new MenuItem("N", "New Game 🎮", DoNewGame),
           new MenuItem("L", "Load Game 💿", LoadGame),
-          new MenuItem("D", "Delete SavedGame ❌", DeleteSavedGame),
+          new MenuItem("D", "Delete SavedGame 🗑️", DeleteSavedGame),
 
           new MenuItem("O", "Options ⚙️", secondMenu.RunMenu)
      });
@@ -356,13 +356,6 @@ string DoNewGame()
 
      gameRepo.SavaGame(newGame);
      Console.WriteLine($"Game: {newGame}");
-     // var checkersGame = new CheckerGame();
-     // UI.DrawGameBoard(game.GetBoard());
-     // // Gameplay will be implemented here.
-     // game.PlayGame();
-     //
-     //
-     // OfferSaving();
      WaitForUserInput();
 
 
@@ -405,14 +398,13 @@ string SaveCurrentOptions()
      Console.WriteLine(gameOptions);
      Console.CursorVisible = true;
      Console.WriteLine("How would you like to name this game option? You should choose a name that is not already used.");
-     Console.WriteLine("Hint: Taken names:");
+     Console.WriteLine("Hint: Taken names:\n\n");
      if (optionRepo.GetGameOptionsList().Count != 0)
      {
           foreach (var opt in optionRepo.GetGameOptionsList())
           {
 
                Console.WriteLine(opt);
-               Console.WriteLine(optionRepo.GetGameOptions(opt).Name);
 
           }
      }
