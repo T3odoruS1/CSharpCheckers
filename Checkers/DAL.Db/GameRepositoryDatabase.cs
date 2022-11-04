@@ -10,6 +10,8 @@ public class GameRepositoryDatabase : IGameGameRepository
     public string Name { get; set; } = FsHelpers.DatabaseIdentifier;
     
     
+    
+    
     private readonly AppDbContext _dbContext;
 
     public GameRepositoryDatabase(AppDbContext dbContext)
@@ -39,6 +41,19 @@ public class GameRepositoryDatabase : IGameGameRepository
             throw new ArgumentException($"You tried to save game with name {game.Name}. That name is already used.");
         }
 
+        
+        var optionsFromDb = _dbContext.CheckerGameOptions.
+            FirstOrDefault(o => o.Name == game.GameOptions!.Name);
+        Console.WriteLine(optionsFromDb);
+        
+        if (optionsFromDb == null)
+        {
+            throw new Exception();
+        }
+
+        optionsFromDb!.GameCount = optionsFromDb.GameCount + 1;
+        
+        
         _dbContext.CheckerGames.Add(game);
         _dbContext.SaveChanges();
     }

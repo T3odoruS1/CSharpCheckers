@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using GameBrain;
 
 namespace Domain;
@@ -14,6 +15,7 @@ public class CheckerGameState
 
 
     public int CheckerGameId { get; set; }
+    
     public CheckerGame? CheckerGame { get; set; }
     
 }

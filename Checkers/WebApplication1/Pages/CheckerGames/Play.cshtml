@@ -1,0 +1,46 @@
+@page
+@using GameBrain
+@model WebApplication1.Pages.CheckerGames.Play
+
+<table class="table table-bordered">
+    @for (var y = 0; y < Model.State.GetLength(1); y++)
+    {
+        <tr style="height: 50px">
+            @for (var x = 0; x < Model.State.GetLength(0); x++)
+            {
+                    @if (Model.Brain.GetBoard()[x,y] == EGameSquareState.Unplayable)
+                    {
+                        <td style="height: 50px; width: 50px;">
+                                                        <text>&nbsp;</text>
+
+                        </td>
+
+                        continue;
+                    }
+                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.Black)
+                    {
+                        <td style="height: 50px; width: 50px; background-color: #1a1e21;">
+
+                            <text style="color: aliceblue; justify-content: center">◎</text>
+                            </td>
+
+                    }
+                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.White)
+                    {
+                        <td style="height: 50px; width: 50px; background-color: #1a1e21">
+
+                        <text style="color: aliceblue; justify-content: center">◉</text>
+                            </td>
+
+                    }
+                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.Empty)
+                    {<td style="height: 50px; width: 50px; background-color: #1a1e21">
+                        <text>&nbsp;</text>
+
+                     </td>
+                        
+                    }
+            }
+        </tr>
+    }
+</table>

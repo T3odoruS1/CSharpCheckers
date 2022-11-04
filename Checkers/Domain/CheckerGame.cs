@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain;
 
@@ -24,7 +25,7 @@ public class CheckerGame
 
     public CheckerGameOptions? GameOptions { get; set; }
     public int OptionsId { get; set; }
-
+    
     public ICollection<CheckerGameState>? CheckerGameStates { get; set; }
 
 

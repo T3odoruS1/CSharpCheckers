@@ -351,7 +351,6 @@ string DoNewGame()
      };
 
      newGame.CheckerGameStates.Add(gameState);
-     gameOptions.GameCount++;
      optionRepo.UpdateGameOptions(gameOptions);
 
      gameRepo.SavaGame(newGame);
