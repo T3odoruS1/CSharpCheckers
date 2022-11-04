@@ -1,0 +1,53 @@
+@page
+@model WebApplication1.Pages.CheckerGames.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>CheckerGame</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="CheckerGame.Id" />
+            <div class="form-group">
+                <label asp-for="CheckerGame.Name" class="control-label"></label>
+                <input asp-for="CheckerGame.Name" class="form-control" />
+                <span asp-validation-for="CheckerGame.Name" class="text-danger"></span>
+            </div>
+                <input asp-for="CheckerGame.StarterAt" type="hidden" class="form-control" />
+            <input asp-for="CheckerGame.GameOverAt" type="hidden" class="form-control" />
+
+                <input asp-for="CheckerGame.GameWonBy" type="hidden" class="form-control" />
+
+            <div class="form-group">
+                <label asp-for="CheckerGame.Player1Name" class="control-label"></label>
+                <input asp-for="CheckerGame.Player1Name" class="form-control" />
+                <span asp-validation-for="CheckerGame.Player1Name" class="text-danger"></span>
+            </div>
+            <input asp-for="CheckerGame.Player1Type" type="hidden" class="form-control"></input>
+            <div class="form-group">
+                <label asp-for="CheckerGame.Player2Name" class="control-label"></label>
+                <input asp-for="CheckerGame.Player2Name" class="form-control" />
+                <span asp-validation-for="CheckerGame.Player2Name" class="text-danger"></span>
+            </div>
+            <input asp-for="CheckerGame.Player2Type" type="hidden" class="form-control"></input>
+            <input asp-for="CheckerGame.OptionsId" type="hidden" class="form-control" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

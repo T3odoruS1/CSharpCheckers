@@ -1,0 +1,43 @@
+@page
+@model WebApplication1.Pages.CheckerGameStates.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>CheckerGameState</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CheckerGameState.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CheckerGameState.CreatedAt)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CheckerGameState.NextMoveByBlack)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CheckerGameState.NextMoveByBlack)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CheckerGameState.SerializedGameBoard)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CheckerGameState.SerializedGameBoard)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CheckerGameState.CheckerGame)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CheckerGameState.CheckerGame!.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.CheckerGameState?.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
