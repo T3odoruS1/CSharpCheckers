@@ -16,3 +16,44 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.game-table {
+  width: initial;
+  background-color: #cfe2ff;
+}
+
+
+.game-table-cell {
+  font-size: 35px ;
+  width: 100px;
+  min-width: 100px;
+  height: 100px;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.game-table-cell-white {
+  background-color: white !important;
+}
+
+.game-table-cell-black {
+  background-color: black !important;
+}
+
+.game-table-cell-move-is-possible {
+  background-color: yellow !important;
+}
+
+.clickable-div{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.active-checker-div{
+  color: darkred;
+}

@@ -1,6 +1,7 @@
 // ============================= SET UP DEPENDENCY INJECTION ====================================
 
 using DAL.Db;
+using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,9 @@ builder.Services.AddRazorPages();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
+
+builder.Services.AddScoped<IGameGameRepository, GameRepositoryDatabase>();
+// builder.Services.AddScoped<IGameOptionRepository, GameOptionsRepositoryDatabase>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

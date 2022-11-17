@@ -28,10 +28,20 @@ public class GameRepositoryDatabase : IGameGameRepository
         return res.Select(o => o.Name).ToList();
     }
 
-    public CheckerGame GetGame(string name)
+    public CheckerGame GetGameByName(string name)
     {
-        return _dbContext.CheckerGames.
-            First(o => o.Name == name);
+        return _dbContext.CheckerGames
+            .Include(g => g.CheckerGameStates)
+            .Include(g => g.GameOptions)
+            .First(o => o.Name == name);
+    }
+    
+    public  CheckerGame GetGameById(int id)
+    {
+        return _dbContext.CheckerGames
+            .Include(g => g.GameOptions)
+            .Include(g => g.CheckerGameStates)
+            .First(g => g.Id == id);
     }
 
     public void SavaGame(CheckerGame game)
@@ -42,17 +52,17 @@ public class GameRepositoryDatabase : IGameGameRepository
         }
 
         
-        var optionsFromDb = _dbContext.CheckerGameOptions.
-            FirstOrDefault(o => o.Name == game.GameOptions!.Name);
-        Console.WriteLine(optionsFromDb);
-        
-        if (optionsFromDb == null)
-        {
-            throw new Exception();
-        }
-
-        optionsFromDb!.GameCount = optionsFromDb.GameCount + 1;
-        
+        // var optionsFromDb = _dbContext.CheckerGameOptions.
+        //     First(o => o.Id == game.GameOptions!.Id);
+        // Console.WriteLine(optionsFromDb);
+        //
+        // if (optionsFromDb == null)
+        // {
+        //     throw new Exception();
+        // }
+        //
+        // optionsFromDb!.GameCount = optionsFromDb.GameCount + 1;
+        //
         
         _dbContext.CheckerGames.Add(game);
         _dbContext.SaveChanges();
@@ -84,7 +94,7 @@ public class GameRepositoryDatabase : IGameGameRepository
 
     public void DeleteGameByName(string name)
     {
-        var gamesFromDb = GetGame(name);
+        var gamesFromDb = GetGameByName(name);
         _dbContext.CheckerGames.Remove(gamesFromDb);
         _dbContext.SaveChanges();
     }

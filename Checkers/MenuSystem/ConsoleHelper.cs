@@ -1,6 +1,6 @@
 namespace MenuSystem;
 
-    public static class ConsoleHelper
+public static class ConsoleHelper
 {
     public static string MultipleChoice(bool canCancel, string title, params string[] options)
     {
@@ -15,7 +15,7 @@ namespace MenuSystem;
             optionsPerLine = 1;
             break;
         }
-        
+
         var currentSelection = 0;
 
         ConsoleKey key;
@@ -30,10 +30,9 @@ namespace MenuSystem;
 
             for (int i = 0; i < options.Length; i++)
             {
-                
                 Console.SetCursorPosition(startX + (i % optionsPerLine) * spacingPerLine, startY + i / optionsPerLine);
 
-                if(i == currentSelection)
+                if (i == currentSelection)
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
 
                 Console.Write(options[i]);

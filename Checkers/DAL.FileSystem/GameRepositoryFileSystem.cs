@@ -27,7 +27,7 @@ public class GameRepositoryFileSystem : IGameGameRepository
         return res;
     }
 
-    public CheckerGame GetGame(string name)
+    public CheckerGame GetGameByName(string name)
     {
         var fileContent = File.ReadAllText(FsHelpers.GetFileName(name, _gameDir));
         var checkerGame = JsonSerializer.Deserialize<CheckerGame>(fileContent);
@@ -42,7 +42,12 @@ public class GameRepositoryFileSystem : IGameGameRepository
         return checkerGame;
     }
 
-    
+    public CheckerGame GetGameById(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+
     // Save game. Throws exception if game name is already taken
     public void SavaGame(CheckerGame game)
     {

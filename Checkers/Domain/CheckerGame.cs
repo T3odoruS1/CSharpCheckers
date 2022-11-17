@@ -23,10 +23,10 @@ public class CheckerGame
 
     public EPlayerType Player2Type { get; set; }
 
-    public CheckerGameOptions? GameOptions { get; set; }
     public int OptionsId { get; set; }
+    public CheckerGameOptions? GameOptions { get; set; } = default!;
     
-    public ICollection<CheckerGameState>? CheckerGameStates { get; set; }
+    public ICollection<CheckerGameState>? CheckerGameStates { get; set; } 
 
 
     public override string ToString()

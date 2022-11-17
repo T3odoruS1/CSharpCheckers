@@ -141,7 +141,7 @@ string DeleteSavedGame()
      var gameDict = new Dictionary<int, string>();
      foreach (var savedGame in allSavedGames)
      {
-          var checkerGame = gameRepo.GetGame(savedGame);
+          var checkerGame = gameRepo.GetGameByName(savedGame);
           Console.WriteLine($"{i}) - {savedGame}");
           Console.WriteLine($"Options : {checkerGame.GameOptions}");
           var jaggedBoard =
@@ -168,7 +168,7 @@ string DeleteSavedGame()
      }
      else
      {
-          var gameToDelete = gameRepo.GetGame(gameDict[a]);
+          var gameToDelete = gameRepo.GetGameByName(gameDict[a]);
           gameToDelete.GameOptions!.GameCount--;
           optionRepo.UpdateGameOptions(gameToDelete.GameOptions);
           gameRepo.DeleteGameByName(gameDict[a]);
@@ -184,7 +184,7 @@ string LoadGame()
      var gameDict = new Dictionary<int, string>();
      foreach (var savedGame in allSavedGames)
      {
-          var checkerGame = gameRepo.GetGame(savedGame);
+          var checkerGame = gameRepo.GetGameByName(savedGame);
           Console.WriteLine($"\n{i}) - {checkerGame.Name}");
           
           Console.WriteLine(checkerGame.GameOptions);
@@ -213,7 +213,7 @@ string LoadGame()
           }
           else
           {
-               var gameToBeLoaded = gameRepo.GetGame(gameDict[a]);
+               var gameToBeLoaded = gameRepo.GetGameByName(gameDict[a]);
                gameOptions = gameToBeLoaded.GameOptions;
                Console.WriteLine(gameToBeLoaded);
                UI.DrawGameBoard(FsHelpers.JaggedTo2D(

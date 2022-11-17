@@ -1,0 +1,10 @@
+
+different checker behaviors
+
+regular:
+        If not taking moves only forward 1 square
+        
+        
+king:
+        This variation if flying kings.
+        Moves multiple squares backward and forward

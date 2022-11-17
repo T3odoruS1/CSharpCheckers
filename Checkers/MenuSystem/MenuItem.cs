@@ -13,6 +13,6 @@ public class MenuItem
         Title = title;
         MethodToRun = methodToRun;
     }
-    
+
     public override string ToString() => Shortcut + ") " + Title;
 }

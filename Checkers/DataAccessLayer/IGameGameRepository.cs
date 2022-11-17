@@ -15,7 +15,9 @@ public interface IGameGameRepository
     
     
     // Get game name by game name
-    CheckerGame GetGame(string name);
+    CheckerGame GetGameByName(string name);
+
+    CheckerGame GetGameById(int id);
     
     
     // Save game

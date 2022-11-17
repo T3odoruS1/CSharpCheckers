@@ -1,46 +1,132 @@
 using System.Text.Json;
-using DAL.Db;
 using DAL.FileSystem;
+using DataAccessLayer;
+using Domain;
 using GameBrain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.Pages.CheckerGames;
 
 public class Play : PageModel
 {
-    
-    private readonly AppDbContext _context;
+    private readonly IGameGameRepository _repo;
 
-    public Play(AppDbContext context)
+
+    public Play(IGameGameRepository repo)
     {
-        _context = context;
+        _repo = repo;
     }
 
 
     public CheckersBrain Brain { get; set; } = default!;
-    public EGameSquareState[,] State { get; set; } = default!;
-    
-    public async Task<IActionResult> OnGet(int? id)
-    {
-        var game = await _context.CheckerGames
-            .Include(g => g.GameOptions)
-            .Include(g => g.CheckerGameStates)
-            .FirstAsync(g => g.Id == id);
+    public EGameSquareState[,] Board { get; set; } = default!;
+    public CheckerGameState GameState { get; set; } = default!;
+    public CheckerGame Game { get; set; } = default!;
 
-        var options = await _context.CheckerGameOptions
-            .FirstAsync(o => o.Id == game.OptionsId);
-        
-        if (game == null || options == null || game.CheckerGameStates == null)
+    public int? InitX { get; set; }
+    public int? InitY { get; set; }
+    public bool FirstReq { get; set; }
+
+    public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY)
+    {
+        if (firstReq != null)
+        {
+            FirstReq = true;
+        }
+
+        if (id == null)
         {
             return NotFound();
         }
 
+        Game = _repo.GetGameById((int)id);
+        
+        var options = Game.GameOptions;
+
+        if (Game.CheckerGameStates == null || options == null)
+        {
+            return NotFound();
+        }
+
+
+        // Get brain and state
         Brain = new CheckersBrain(options);
-        var jsonString = game.CheckerGameStates!.Last().SerializedGameBoard;
+        GameState = Game.CheckerGameStates.Last();
+
+        Console.WriteLine(GameState);
+
+        if (firstReq != null && x != null && y != null)
+        {
+            InitX = x;
+            InitY = y;
+        }
+
+
+        // Unserialize json game board
+        var jsonString = GameState.SerializedGameBoard;
         var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
-        State = FsHelpers.JaggedTo2D(jagged!);
-        return Page();
+        Board = FsHelpers.JaggedTo2D(jagged!);
+        Brain.SetGameBoard(Board, GameState);
+
+        CheckIfMakeAnotherTake();
+
+        // If params needed for the move are not null - make move
+            if (firstReq != null || x == null || y == null || initX == null || initY == null) return Page();
+
+
+
+
+            Brain.MoveChecker((int)initX, (int)initY, (int)x, (int)y);
+            var newState = new CheckerGameState
+            {
+                SerializedGameBoard = JsonSerializer.Serialize(
+                    FsHelpers.ToJaggedArray(Brain.GetBoard())),
+                NextMoveByBlack = Brain.NextMoveByBlack()
+            };
+            // Check if taking was preformed
+            // && Brain.CanTake((int)x, (int)y)
+            if (Brain.TakingDone() && Brain.CanTake((int)x, (int)y))
+            {
+                // If taking was preformed mark which checker was doing it.
+                newState.CheckerThatPreformedTakingX = x;
+                newState.CheckerThatPreformedTakingY = y;
+
+            }
+            else
+            {
+                FirstReq = false;
+            }
+
+            Game.CheckerGameStates.Add(newState);
+            GameState = newState;
+            CheckIfMakeAnotherTake();
+
+            
+
+            _repo.UpdateGame(Game);
+
+
+            return Page();
+        }
+
+
+    private void CheckIfMakeAnotherTake()
+    {
+        if (GameState.CheckerThatPreformedTakingX != null && GameState.CheckerThatPreformedTakingY != null)
+        {
+
+            if (Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
+                    (int)GameState.CheckerThatPreformedTakingY))
+            {
+                FirstReq = true;
+                InitX = GameState.CheckerThatPreformedTakingX;
+                InitY = GameState.CheckerThatPreformedTakingY;
+            }
+                
+        }
     }
+    
+    
+    
 }

@@ -33,7 +33,7 @@ public class Menu
         if (_level == EMenuLevel.Other)
             _menuItems.Add(ShortcutGoMain, _menuItemGoToMain);
         _menuItems.Add(ShortcutExit, _menuItemExit);
-                
+
         foreach (var dictValue in _menuItems.Values)
         {
             _menuItemsAsString.Add(dictValue.Title);
@@ -42,7 +42,6 @@ public class Menu
 
     public string RunMenu()
     {
-        
         do
         {
             string? methodReturnValue = null;
@@ -51,17 +50,17 @@ public class Menu
                 _menuDone = true;
                 _userChoice = methodReturnValue ?? _userChoice;
                 continue;
-
             }
+
             _userChoice = GetNewUserInput();
             if (_menuItems.ContainsKey(_userChoice))
-                
+
             {
                 if (_menuItems[_userChoice].MethodToRun != null)
                 {
                     methodReturnValue = _menuItems[_userChoice].MethodToRun!();
                 }
-                
+
                 if (_userChoice == ShortcutGoBack || Int32.TryParse(_userChoice, out _))
                 {
                     _menuDone = true;

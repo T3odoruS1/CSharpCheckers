@@ -1,46 +1,107 @@
 @page
 @using GameBrain
+@using Microsoft.VisualBasic
 @model WebApplication1.Pages.CheckerGames.Play
 
-<table class="table table-bordered">
-    @for (var y = 0; y < Model.State.GetLength(1); y++)
+
+@Model.GameState
+@Model.FirstReq
+
+<h2>Next move @(Model.Brain.NextMoveByBlack() ? $"Player B - {Model.Game.Player1Name} - Black" : 
+                  $"Player A - {Model.Game.Player2Name} - White")</h2>
+
+<table class="table table-bordered game-table">
+    @for (var y = 0; y < Model.Board.GetLength(1); y++)
     {
-        <tr style="height: 50px">
-            @for (var x = 0; x < Model.State.GetLength(0); x++)
+        <tr>
+            @for (var x = 0; x < Model.Board.GetLength(0); x++)
             {
-                    @if (Model.Brain.GetBoard()[x,y] == EGameSquareState.Unplayable)
+                <td class="game-table-cell @GetCellBgrClass(Model.Board[x, y], x, y)">
+
+                    @if (!Model.FirstReq && Model.Board[x, y] != EGameSquareState.Unplayable &&
+                         Model.Board[x, y] != EGameSquareState.Empty && Model.Brain.HasMoves(x, y))
                     {
-                        <td style="height: 50px; width: 50px;">
-                                                        <text>&nbsp;</text>
+                        if (Model.Brain.NextMoveByBlack() && (Model.Board[x, y] == EGameSquareState.Black || Model.Board[x, y] == EGameSquareState.BlackKing))
+                        {
+                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
+                                @GetCellContents(Model.Board[x, y])
+                            </div> 
+                        }else if (!Model.Brain.NextMoveByBlack() && (Model.Board[x, y] == EGameSquareState.White || Model.Board[x, y] == EGameSquareState.WhiteKing))
+                        {
+                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
+                                @GetCellContents(Model.Board[x, y])
+                            </div> 
+                        }
+                        else
+                        {
+                            <div class="clickable-div">@GetCellContents(Model.Board[x, y])</div>
 
-                        </td>
+                        }
 
-                        continue;
                     }
-                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.Black)
+                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null)
                     {
-                        <td style="height: 50px; width: 50px; background-color: #1a1e21;">
+                        if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y))
+                        {
+                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY'">
 
-                            <text style="color: aliceblue; justify-content: center">◎</text>
-                            </td>
+                                @GetCellContents(Model.Board[x, y])
 
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="clickable-div @(x==Model.InitX&&y==Model.InitY ? "active-checker-div":"")">@GetCellContents(Model.Board[x, y])</div>
+                        }
                     }
-                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.White)
+                    else
                     {
-                        <td style="height: 50px; width: 50px; background-color: #1a1e21">
-
-                        <text style="color: aliceblue; justify-content: center">◉</text>
-                            </td>
-
+                        <div 
+                            class="clickable-div">@GetCellContents(Model.Board[x, y])
+                            </div>
                     }
-                    @if (Model.Brain.GetBoard()[x, y] == EGameSquareState.Empty)
-                    {<td style="height: 50px; width: 50px; background-color: #1a1e21">
-                        <text>&nbsp;</text>
 
-                     </td>
-                        
-                    }
+                </td>
             }
         </tr>
     }
 </table>
+
+
+@functions
+{
+    string GetCellBgrClass(EGameSquareState piece, int x, int y)
+    {
+    // If initial x and initial y is set then run a check if this square is available for the move.
+        if (Model.InitX != null && Model.InitY != null)
+        {
+            if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y))
+            {
+                return "game-table-cell-move-is-possible";
+            }
+        }
+        return piece == EGameSquareState.Unplayable ? "game-table-cell-white" : "game-table-cell-black";
+    }
+
+    string GetCellContents(EGameSquareState piece)
+    {
+        switch (piece)
+        {
+            case EGameSquareState.Unplayable:
+                return Html.Raw(Strings.Space(3)).ToString()!;
+            case EGameSquareState.Empty:
+                return Html.Raw(Strings.Space(3)).ToString()!;
+            case EGameSquareState.Black:
+                return Html.Raw(Strings.Space(3))! + "◎" + Html.Raw(Strings.Space(3))!;
+            case EGameSquareState.White:
+                return Html.Raw(Strings.Space(3))! + "◉" + Html.Raw(Strings.Space(3))!;
+            case EGameSquareState.WhiteKing:
+                return "=◉=";
+            case EGameSquareState.BlackKing:
+                return "=◎=";
+        }
+        return "";
+    }
+
+
+}

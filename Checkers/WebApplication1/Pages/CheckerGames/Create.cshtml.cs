@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DAL.Db;
 using DAL.FileSystem;
+using DataAccessLayer;
 using Domain;
 using GameBrain;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +18,18 @@ namespace WebApplication1.Pages.CheckerGames
 {
     public class CreateModel : PageModel
     {
-        private readonly DAL.Db.AppDbContext _context;
+        private  DAL.Db.AppDbContext _context;
+        private IGameGameRepository _repository;
 
-        public CreateModel(DAL.Db.AppDbContext context)
+        public CreateModel(DAL.Db.AppDbContext context, IGameGameRepository repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         public IActionResult OnGet()
         {
-            ViewData["OptionsId"] = new SelectList(_context.CheckerGameOptions, "Id", "Name");
+            OptionsSelectList = new SelectList(_context.CheckerGameOptions, "Id", "Name");
             return Page();
         }
 
@@ -40,27 +43,23 @@ namespace WebApplication1.Pages.CheckerGames
         
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPostAsync()
         {
           if (!ModelState.IsValid || _context.CheckerGames == null || CheckerGame == null)
             {
                 return Page();
             }
 
-            _context.CheckerGames.Add(CheckerGame);
-            Console.WriteLine(CheckerGame.GameOptions);
-            Domain.CheckerGameOptions options = await _context.CheckerGameOptions.FirstAsync(o => o.Id == CheckerGame.OptionsId);
-            options.GameCount++;
-            var brain = new CheckersBrain(options);
-            var board = brain.GetBoard();
-            var jaggedBoard = FsHelpers.ToJaggedArray(board);
-            var serializedString = JsonSerializer.Serialize(jaggedBoard);
-            var gameState = new CheckerGameState();
-            gameState.SerializedGameBoard = serializedString;
-            gameState.NextMoveByBlack = !options.WhiteStarts;
-            CheckerGame.CheckerGameStates = new List<CheckerGameState>();
-            CheckerGame.CheckerGameStates.Add(gameState);
-            await _context.SaveChangesAsync();
+          var optId = CheckerGame.OptionsId;
+          var options = _context.CheckerGameOptions.First(o => o.Id == optId);
+
+          CheckerGame.GameOptions = options;
+          var state = new CheckerGameState();
+          var brain = new CheckersBrain(options);
+          state.SerializedGameBoard = JsonSerializer.Serialize(FsHelpers.ToJaggedArray(brain.GetBoard()));
+          CheckerGame.CheckerGameStates = new List<CheckerGameState>();
+          CheckerGame.CheckerGameStates.Add(state);
+            _repository.SavaGame(CheckerGame);
 
             return RedirectToPage("./Index");
         }
