@@ -11,6 +11,7 @@ public class CheckersBrain
     private bool _gameOver = false;
     private bool _nextMoveByBlack;
     private bool _takingDone;
+    private bool _canDoAnotherTake;
     
     public CheckersBrain(CheckerGameOptions options)
     {
@@ -188,7 +189,7 @@ public class CheckersBrain
                 }
                 
             }
-            else
+            else if (!_canDoAnotherTake)
             {
                 if (_gameBoard[iniX, iniY] == EGameSquareState.Black)
                 {
@@ -291,8 +292,6 @@ public class CheckersBrain
 
     public bool CanTake(int x, int y)
     {
-        // TODO run taking tests
-
         if (_gameBoard[x, y] == EGameSquareState.Black || _gameBoard[x, y] == EGameSquareState.White)
         {
             if (_gameBoard[x, y] == EGameSquareState.Black)
@@ -398,7 +397,12 @@ public class CheckersBrain
                 if (!CanTake(destX, destY))
                 {
                     _nextMoveByBlack = !_nextMoveByBlack;
+                    _canDoAnotherTake = false;
 
+                }
+                else
+                {
+                    _canDoAnotherTake = true;
                 }
             }
             else
@@ -406,7 +410,25 @@ public class CheckersBrain
                 _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
                 _gameBoard[iniX, iniY] = EGameSquareState.Empty;
                 _nextMoveByBlack = !_nextMoveByBlack;
+                _canDoAnotherTake = false;
                 _takingDone = false;
+            }
+
+            
+            // Change regular checker into king
+            if (_gameBoard[destX, destY] == EGameSquareState.Black)
+            {
+                if (destY == 0)
+                {
+                    _gameBoard[destX, destY] = EGameSquareState.BlackKing;
+                }
+            }
+            else
+            {
+                if (destY == _gameBoard.GetLength(0) - 1)
+                {
+                    _gameBoard[destX, destY] = EGameSquareState.WhiteKing;
+                }
             }
         } // TODO taking for kings.
         
@@ -429,8 +451,4 @@ public class CheckersBrain
         return (a + b) / 2;
     }
 
-    public void ToggleMoveBy()
-    {
-        _nextMoveByBlack = !_nextMoveByBlack;
-    }
 }

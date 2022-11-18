@@ -88,13 +88,13 @@
         switch (piece)
         {
             case EGameSquareState.Unplayable:
-                return Html.Raw(Strings.Space(3)).ToString()!;
+                return "";
             case EGameSquareState.Empty:
-                return Html.Raw(Strings.Space(3)).ToString()!;
+                return "";
             case EGameSquareState.Black:
-                return Html.Raw(Strings.Space(3))! + "◎" + Html.Raw(Strings.Space(3))!;
+                return "◎";
             case EGameSquareState.White:
-                return Html.Raw(Strings.Space(3))! + "◉" + Html.Raw(Strings.Space(3))!;
+                return "◉";
             case EGameSquareState.WhiteKing:
                 return "=◉=";
             case EGameSquareState.BlackKing:
