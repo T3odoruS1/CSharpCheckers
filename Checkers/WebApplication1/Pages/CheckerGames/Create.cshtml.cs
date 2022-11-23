@@ -61,7 +61,7 @@ namespace WebApplication1.Pages.CheckerGames
           CheckerGame.CheckerGameStates.Add(state);
             _repository.SavaGame(CheckerGame);
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("Play", new {id = CheckerGame.Id});
         }
     }
 }

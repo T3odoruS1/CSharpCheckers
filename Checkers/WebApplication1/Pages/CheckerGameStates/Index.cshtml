@@ -20,9 +20,6 @@
                 @Html.DisplayNameFor(model => model.CheckerGameState[0].NextMoveByBlack)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CheckerGameState[0].SerializedGameBoard)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.CheckerGameState[0].CheckerGame)
             </th>
             <th></th>
@@ -38,14 +35,9 @@
                 @Html.DisplayFor(modelItem => item.NextMoveByBlack)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SerializedGameBoard)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.CheckerGame!.Name)
             </td>
             <td>
-                @* <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> | *@
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>

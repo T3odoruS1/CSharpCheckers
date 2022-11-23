@@ -28,8 +28,11 @@ public class Play : PageModel
     public int? InitY { get; set; }
     public bool FirstReq { get; set; }
 
+    public bool? WonByBlack { get; set; }
+
     public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY)
     {
+        // Check if it is the first request(initial player choice)
         if (firstReq != null)
         {
             FirstReq = true;
@@ -41,7 +44,7 @@ public class Play : PageModel
         }
 
         Game = _repo.GetGameById((int)id);
-        
+
         var options = Game.GameOptions;
 
         if (Game.CheckerGameStates == null || options == null)
@@ -54,7 +57,6 @@ public class Play : PageModel
         Brain = new CheckersBrain(options);
         GameState = Game.CheckerGameStates.Last();
 
-        Console.WriteLine(GameState);
 
         if (firstReq != null && x != null && y != null)
         {
@@ -63,59 +65,78 @@ public class Play : PageModel
         }
 
 
-        // Unserialize json game board
+        // Unserialize json game board. Get game board.
         var jsonString = GameState.SerializedGameBoard;
         var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
         Board = FsHelpers.JaggedTo2D(jagged!);
         Brain.SetGameBoard(Board, GameState);
+        if (Game.GameOverAt != null)
+        {
+            WonByBlack = Game.GameWonBy == Game.Player2Name;
+            return Page();
+            
+        }
+        
+        
+
+        // Check if player wants to switch the checker that he wants to use
+        if (x != null && y != null && initX != null && initY != null &&
+            x == initX && y == initY)
+        {
+            Response.Redirect($"./Play?id={Game.Id}");
+            return Page();
+        }
 
         CheckIfMakeAnotherTake();
 
         // If params needed for the move are not null - make move
-            if (firstReq != null || x == null || y == null || initX == null || initY == null) return Page();
+        if (firstReq != null || x == null || y == null || initX == null || initY == null) return Page();
 
 
-
-
-            Brain.MoveChecker((int)initX, (int)initY, (int)x, (int)y);
-            var newState = new CheckerGameState
-            {
-                SerializedGameBoard = JsonSerializer.Serialize(
-                    FsHelpers.ToJaggedArray(Brain.GetBoard())),
-                NextMoveByBlack = Brain.NextMoveByBlack()
-            };
-            // Check if taking was preformed
-            // && Brain.CanTake((int)x, (int)y)
-            if (Brain.TakingDone() && Brain.CanTake((int)x, (int)y))
-            {
-                // If taking was preformed mark which checker was doing it.
-                newState.CheckerThatPreformedTakingX = x;
-                newState.CheckerThatPreformedTakingY = y;
-
-            }
-            else
-            {
-                FirstReq = false;
-            }
-
-            Game.CheckerGameStates.Add(newState);
-            GameState = newState;
-            CheckIfMakeAnotherTake();
-
-            
-
-            _repo.UpdateGame(Game);
-
-
-            return Page();
+        Brain.MoveChecker((int)initX, (int)initY, (int)x, (int)y);
+        var newState = new CheckerGameState
+        {
+            SerializedGameBoard = JsonSerializer.Serialize(
+                FsHelpers.ToJaggedArray(Brain.GetBoard())),
+            NextMoveByBlack = Brain.NextMoveByBlack()
+        };
+        // Check if taking was preformed
+        // && Brain.CanTake((int)x, (int)y)
+        if (Brain.TakingDone() && Brain.CanTake((int)x, (int)y))
+        {
+            // If taking was preformed mark which checker was doing it.
+            newState.CheckerThatPreformedTakingX = x;
+            newState.CheckerThatPreformedTakingY = y;
+        }
+        else
+        {
+            FirstReq = false;
         }
 
+        Game.CheckerGameStates.Add(newState);
+        GameState = newState;
+        CheckIfMakeAnotherTake();
+        if (Brain.IsGameOver())
+        {
+            Game.GameWonBy = Brain.GameWonByBlack() ? Game.Player2Name : Game.Player1Name;
+            Game.GameOverAt = DateTime.Now;
+        }
 
+        _repo.UpdateGame(Game);
+        if (Game.GameOverAt != null)
+        {
+            WonByBlack = Game.GameWonBy == Game.Player2Name;
+        }
+
+        return Page();
+    }
+
+
+    // Check if there is a checker that has preformed a take in previous move. If this checker can preform another
     private void CheckIfMakeAnotherTake()
     {
         if (GameState.CheckerThatPreformedTakingX != null && GameState.CheckerThatPreformedTakingY != null)
         {
-
             if (Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
                     (int)GameState.CheckerThatPreformedTakingY))
             {
@@ -123,10 +144,6 @@ public class Play : PageModel
                 InitX = GameState.CheckerThatPreformedTakingX;
                 InitY = GameState.CheckerThatPreformedTakingY;
             }
-                
         }
     }
-    
-    
-    
 }

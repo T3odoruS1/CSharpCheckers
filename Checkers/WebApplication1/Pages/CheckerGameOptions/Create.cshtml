@@ -15,17 +15,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="CheckerGameOptions.Name" class="control-label"></label>
-                <input asp-for="CheckerGameOptions.Name" class="form-control" />
+                <input asp-for="CheckerGameOptions.Name" minlength="1" maxlength="127" required="required" class="form-control" />
                 <span asp-validation-for="CheckerGameOptions.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CheckerGameOptions.Width" class="control-label"></label>
-                <input asp-for="CheckerGameOptions.Width" class="form-control" />
+                <input asp-for="CheckerGameOptions.Width" min="4" max="128" required="required" id="width-input" class="form-control" />
                 <span asp-validation-for="CheckerGameOptions.Width" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CheckerGameOptions.Height" class="control-label"></label>
-                <input asp-for="CheckerGameOptions.Height" class="form-control" />
+                <input asp-for="CheckerGameOptions.Height" min="4" max="128" required="required" id="height-input" class="form-control" />
                 <span asp-validation-for="CheckerGameOptions.Height" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
@@ -52,3 +52,27 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<script>
+
+const height = document.getElementById("height-input");
+const width = document.getElementById("width-input");
+
+height.addEventListener("input", ev => {
+    if (parseInt(height.value) % 2 !== 0){
+        height.setCustomValidity("This number should be even");
+        height.reportValidity();
+    }else{
+        height.setCustomValidity("");    
+    }
+});
+width.addEventListener("input", ev => {
+    if (parseInt(width.value) % 2 !== 0){
+        width.setCustomValidity("This number should be even");
+        width.reportValidity();
+    }else{
+        width.setCustomValidity("");    
+    }
+});
+
+
+</script>

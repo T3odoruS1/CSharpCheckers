@@ -1,14 +1,26 @@
 @page
 @using GameBrain
-@using Microsoft.VisualBasic
 @model WebApplication1.Pages.CheckerGames.Play
 
+@{
+    ViewData["Title"] = "Play";
+}
+<h2>
+    @if (Model.WonByBlack == null)
+    {
+        <h2>
+            Next move: @(Model.Brain.NextMoveByBlack() ? $"Player B - {@Model.Game.Player1Name} - Black" :
+            $"Player A - {@Model.Game.Player2Name} - White")
+        </h2>
+    }
+    else
+    {
+        <h2>
+            Game won by: @(Model.WonByBlack == true ? Model.Game.Player2Name + " Black " : Model.Game.Player1Name + " White ")
+        </h2>
+    }
 
-@Model.GameState
-@Model.FirstReq
-
-<h2>Next move @(Model.Brain.NextMoveByBlack() ? $"Player B - {Model.Game.Player1Name} - Black" : 
-                  $"Player A - {Model.Game.Player2Name} - White")</h2>
+</h2>
 
 <table class="table table-bordered game-table">
     @for (var y = 0; y < Model.Board.GetLength(1); y++)
@@ -23,42 +35,45 @@
                     {
                         if (Model.Brain.NextMoveByBlack() && (Model.Board[x, y] == EGameSquareState.Black || Model.Board[x, y] == EGameSquareState.BlackKing))
                         {
-                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
+                            <div class="clickable-div highlighted-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
                                 @GetCellContents(Model.Board[x, y])
-                            </div> 
-                        }else if (!Model.Brain.NextMoveByBlack() && (Model.Board[x, y] == EGameSquareState.White || Model.Board[x, y] == EGameSquareState.WhiteKing))
-                        {
-                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
-                                @GetCellContents(Model.Board[x, y])
-                            </div> 
+                            </div>
                         }
-                        else
+                        else if (!Model.Brain.NextMoveByBlack() && (Model.Board[x, y] == EGameSquareState.White || Model.Board[x, y] == EGameSquareState.WhiteKing))
                         {
-                            <div class="clickable-div">@GetCellContents(Model.Board[x, y])</div>
-
-                        }
-
-                    }
-                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null)
-                    {
-                        if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y))
-                        {
-                            <div class="clickable-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY'">
-
+                            <div class="clickable-div highlighted-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y'">
                                 @GetCellContents(Model.Board[x, y])
-
                             </div>
                         }
                         else
                         {
-                            <div class="clickable-div @(x==Model.InitX&&y==Model.InitY ? "active-checker-div":"")">@GetCellContents(Model.Board[x, y])</div>
+                            <div class="clickable-div">
+                                @GetCellContents(Model.Board[x, y])
+                            </div>
+                        }
+                    }
+                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null)
+                    {
+                        if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y) || (x == Model.InitX && y == Model.InitY))
+                        {
+                            <div class="clickable-div highlighted-div" onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY'">
+
+                                @GetCellContents(Model.Board[x, y])
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="clickable-div @(x == Model.InitX && y == Model.InitY ? "active-checker-div" : "")">
+                                @GetCellContents(Model.Board[x, y])
+                            </div>
                         }
                     }
                     else
                     {
-                        <div 
-                            class="clickable-div">@GetCellContents(Model.Board[x, y])
-                            </div>
+                        <div
+                            class="clickable-div">
+                            @GetCellContents(Model.Board[x, y])
+                        </div>
                     }
 
                 </td>
