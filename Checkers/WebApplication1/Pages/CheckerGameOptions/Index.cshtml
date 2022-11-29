@@ -56,8 +56,16 @@
                 @Html.DisplayFor(modelItem => item.GameCount)
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                @if (item.GameCount > 0)
+                {
+                    <text>Can't delete. There are games using these options</text>
+                }
+                else
+                {
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+
+                }
+                
             </td>
         </tr>
 }

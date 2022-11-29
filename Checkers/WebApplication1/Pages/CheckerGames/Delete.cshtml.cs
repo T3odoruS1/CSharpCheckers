@@ -19,8 +19,7 @@ namespace WebApplication1.Pages.CheckerGames
             _context = context;
         }
 
-        [BindProperty]
-      public CheckerGame CheckerGame { get; set; } = default!;
+        [BindProperty] public CheckerGame CheckerGame { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -35,26 +34,32 @@ namespace WebApplication1.Pages.CheckerGames
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 CheckerGame = checkergame;
             }
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public IActionResult OnPostAsync(int? id)
         {
             if (id == null || _context.CheckerGames == null)
             {
                 return NotFound();
             }
-            var checkergame = await _context.CheckerGames.FindAsync(id);
+
+            var checkergame = _context.CheckerGames.Find(id);
 
             if (checkergame != null)
             {
                 CheckerGame = checkergame;
+                var options = _context.CheckerGameOptions.First(
+                    o => o.Id == checkergame.OptionsId);
+                options.GameCount--;
+                _context.CheckerGameOptions.Update(options);    
                 _context.CheckerGames.Remove(CheckerGame);
-                await _context.SaveChangesAsync();
+                _context.SaveChangesAsync();
             }
 
             return RedirectToPage("./Index");

@@ -72,13 +72,5 @@ public class GameOptionsRepositoryDatabase: IGameOptionRepository
             FirstOrDefault(o => o.Name == name);
         return optionsFromDb == null;
     }
-
-    public void DeleteAllOptions()
-    {
-        var allOptions = GetGameOptionsList();
-        foreach (var option in allOptions)
-        {
-            DeleteGameOptions(option);
-        }
-    }
+    
 }

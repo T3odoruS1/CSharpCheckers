@@ -1,4 +1,5 @@
 @page
+@using System.Collections.Specialized
 @model WebApplication1.Pages.CheckerGameOptions.DeleteModel
 
 @{
@@ -46,7 +47,7 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CheckerGameOptions.WhiteStarts)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-2" id="game-count">
             @Html.DisplayNameFor(model => model.CheckerGameOptions.GameCount)
         </dt>
         <dd class="col-sm-10">
@@ -60,3 +61,4 @@
         <a asp-page="./Index">Back to List</a>
     </form>
 </div>
+

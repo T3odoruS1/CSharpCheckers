@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Text.RegularExpressions;
+using Domain;
 
 namespace GameBrain;
 
@@ -160,10 +161,6 @@ public class CheckersBrain
                          _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.WhiteKing)&&
                         _gameBoard[destX, destY] == EGameSquareState.Empty)
                     {
-                        if (destY > iniY)
-                        {
-                            return false;
-                        }
 
                         return true;
                     }
@@ -174,10 +171,6 @@ public class CheckersBrain
                         _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.BlackKing) &&
                         _gameBoard[destX, destY] == EGameSquareState.Empty)
                     {
-                        if (destY < iniY)
-                        {
-                            return false;
-                        }
 
                         return true;
                     }
@@ -444,62 +437,35 @@ public class CheckersBrain
     {
         if (_gameBoard[x, y] == EGameSquareState.Black || _gameBoard[x, y] == EGameSquareState.White)
         {
-            if (_gameBoard[x, y] == EGameSquareState.Black)
+            
+            try
             {
+                if (MoveIsPossible(x, y, x - 2, y - 2))
+                {
+                    return true;
+                }
+
+
                 try
                 {
-                    if (MoveIsPossible(x, y, x - 2, y - 2))
-                    {
-                        return true;
-                    }
-
-
-                    try
-                    {
-                        return MoveIsPossible(x, y, x + 2, y - 2);
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        return false;
-                    }
+                    return MoveIsPossible(x, y, x + 2, y - 2);
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    try
-                    {
-                        return MoveIsPossible(x, y, x + 2, y - 2);
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
-
-            if (_gameBoard[x, y] == EGameSquareState.White)
+            catch (IndexOutOfRangeException)
             {
                 try
                 {
-                    if (MoveIsPossible(x, y, x - 2, y + 2))
-                    {
-                        return true;
-                    }
-
-
-                    try
-                    {
-                        return MoveIsPossible(x, y, x + 2, y + 2);
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        return false;
-                    }
+                    return MoveIsPossible(x, y, x + 2, y + 2);
                 }
                 catch (IndexOutOfRangeException)
                 {
                     try
                     {
-                        return MoveIsPossible(x, y, x + 2, y + 2);
+                        return MoveIsPossible(x, y, x - 2, y + 2);
                     }
                     catch (IndexOutOfRangeException)
                     {

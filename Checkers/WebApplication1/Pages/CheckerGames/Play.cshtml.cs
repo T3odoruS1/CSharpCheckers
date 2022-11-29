@@ -29,21 +29,31 @@ public class Play : PageModel
     public bool FirstReq { get; set; }
 
     public bool? WonByBlack { get; set; }
+    
+    public int PlayerNo { get; set; }
 
-    public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY)
+    public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY, int? playerNo)
     {
         // Check if it is the first request(initial player choice)
+        if (id == null)
+        {
+            return RedirectToPage("/Index", new { error = "No game id was provided" });
+        }
+
+        if (playerNo is null or < 0 or > 1)
+        {
+            return RedirectToPage("/Index", new { error = "No player number was provided or is not in allowed range." });
+        }
+
+        PlayerNo = playerNo.Value;
+
         if (firstReq != null)
         {
             FirstReq = true;
         }
 
-        if (id == null)
-        {
-            return NotFound();
-        }
 
-        Game = _repo.GetGameById((int)id);
+        Game = _repo.GetGameById(id.Value);
 
         var options = Game.GameOptions;
 
@@ -74,17 +84,13 @@ public class Play : PageModel
         {
             WonByBlack = Game.GameWonBy == Game.Player2Name;
             return Page();
-            
         }
-        
-        
 
         // Check if player wants to switch the checker that he wants to use
         if (x != null && y != null && initX != null && initY != null &&
             x == initX && y == initY)
         {
-            Response.Redirect($"./Play?id={Game.Id}");
-            return Page();
+            return RedirectToPage("Play", new { id = Game.Id , playerNo = PlayerNo});
         }
 
         CheckIfMakeAnotherTake();
@@ -101,7 +107,7 @@ public class Play : PageModel
             NextMoveByBlack = Brain.NextMoveByBlack()
         };
         // Check if taking was preformed
-        // && Brain.CanTake((int)x, (int)y)
+
         if (Brain.TakingDone() && Brain.CanTake((int)x, (int)y))
         {
             // If taking was preformed mark which checker was doing it.

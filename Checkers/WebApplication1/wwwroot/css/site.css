@@ -21,13 +21,10 @@ h2 {
   
 }
 
-table{
-  padding: 0;
-  border-spacing: 0;
-  border-width: 30px !important;
-  border-color: dimgray;
- 
+h1 {
+  text-align: center;
 }
+
 
 .game-table{
   width: initial;

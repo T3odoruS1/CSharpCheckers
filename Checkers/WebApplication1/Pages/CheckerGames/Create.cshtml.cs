@@ -18,7 +18,7 @@ namespace WebApplication1.Pages.CheckerGames
 {
     public class CreateModel : PageModel
     {
-        private  DAL.Db.AppDbContext _context;
+        private DAL.Db.AppDbContext _context;
         private IGameGameRepository _repository;
 
         public CreateModel(DAL.Db.AppDbContext context, IGameGameRepository repository)
@@ -33,35 +33,33 @@ namespace WebApplication1.Pages.CheckerGames
             return Page();
         }
 
-        [BindProperty]
-        public CheckerGame CheckerGame { get; set; } = default!;
-        
+        [BindProperty] public CheckerGame CheckerGame { get; set; } = default!;
+
         public SelectList OptionsSelectList { get; set; } = default!;
 
-
-
-        
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public IActionResult OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.CheckerGames == null || CheckerGame == null)
+            if (!ModelState.IsValid || _context.CheckerGames == null || CheckerGame == null)
             {
                 return Page();
             }
 
-          var optId = CheckerGame.OptionsId;
-          var options = _context.CheckerGameOptions.First(o => o.Id == optId);
+            var optId = CheckerGame.OptionsId;
+            var options = _context.CheckerGameOptions.First(o => o.Id == optId);
 
-          CheckerGame.GameOptions = options;
-          var state = new CheckerGameState();
-          var brain = new CheckersBrain(options);
-          state.SerializedGameBoard = JsonSerializer.Serialize(FsHelpers.ToJaggedArray(brain.GetBoard()));
-          CheckerGame.CheckerGameStates = new List<CheckerGameState>();
-          CheckerGame.CheckerGameStates.Add(state);
+            CheckerGame.GameOptions = options;
+            var state = new CheckerGameState();
+            var brain = new CheckersBrain(options);
+            state.SerializedGameBoard = JsonSerializer.Serialize(FsHelpers.ToJaggedArray(brain.GetBoard()));
+            CheckerGame.CheckerGameStates = new List<CheckerGameState>();
+            CheckerGame.CheckerGameStates.Add(state);
+            options.GameCount++;
+            _context.CheckerGameOptions.Update(options);
             _repository.SavaGame(CheckerGame);
 
-            return RedirectToPage("Play", new {id = CheckerGame.Id});
+            return RedirectToPage("./LaunchGame", new { id = CheckerGame.Id });
         }
     }
 }
