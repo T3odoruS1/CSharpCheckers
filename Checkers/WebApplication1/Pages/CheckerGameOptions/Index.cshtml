@@ -5,7 +5,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Game options list</h1>
 
 <p>
     <a asp-page="Create">Create New</a>
@@ -58,7 +58,7 @@
             <td>
                 @if (item.GameCount > 0)
                 {
-                    <text>Can't delete. There are games using these options</text>
+                    <text>Can't delete. There are games using these options. Delete those games first</text>
                 }
                 else
                 {

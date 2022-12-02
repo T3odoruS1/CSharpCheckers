@@ -13,12 +13,16 @@ public static class UI
         var width = board.GetLength(0);
         var height = board.GetLength(1);
         
-        Console.Write("  ");
+        Console.Write("    ");
         for (var i = 0; i <= width; i++)
         {
             
             // Placing the index letters on top of the board
-            Console.Write(GetStringWithWhitespacesForIndex(i));
+            if (i != height)
+            {
+                Console.Write(" " + (i + 1)  + " ");
+ 
+            }
         }
 
         Console.WriteLine();
@@ -106,9 +110,9 @@ public static class UI
     {
         return (height - i) switch
         {
-            < 100 and >= 10 => (height - i + "  "),
-            >= 100 => (height - i + " "),
-            < 10 => (height - i + "   ")
+            < 100 and >= 10 => ((i + 1) + "  "),
+            >= 100 => ((i + 1) + " "),
+            < 10 => ((i + 1) + "   ")
         };
     }
     

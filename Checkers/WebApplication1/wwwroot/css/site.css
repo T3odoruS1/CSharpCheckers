@@ -75,6 +75,31 @@ td{
   color: darkred;
 }
 
-/*.highlighted-div{*/
-/*  background-color: #06357a;*/
-/*}*/
+.home-page-link{
+  font-size: 30px;
+  flex: 1;
+  text-decoration: none;
+  outline: none;
+  text-align: center;
+  line-height: 3;
+  color: black;
+}
+
+.home-page-link:link, .home-page-link:visited, .home-page-link:focus{
+  background: palegoldenrod;
+  color: black;
+  padding: 8px;
+}
+
+.home-page-link:hover {
+  background: orange;
+}
+
+.home-page-link:active {
+  background: darkred;
+  color: white;
+}
+
+.submit-button{
+  margin: 5px;
+}

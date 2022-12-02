@@ -29,7 +29,7 @@ public class Play : PageModel
     public bool FirstReq { get; set; }
 
     public bool? WonByBlack { get; set; }
-    
+
     public int PlayerNo { get; set; }
 
     public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY, int? playerNo)
@@ -42,7 +42,8 @@ public class Play : PageModel
 
         if (playerNo is null or < 0 or > 1)
         {
-            return RedirectToPage("/Index", new { error = "No player number was provided or is not in allowed range." });
+            return RedirectToPage("/Index",
+                new { error = "No player number was provided or is not in allowed range." });
         }
 
         PlayerNo = playerNo.Value;
@@ -90,7 +91,7 @@ public class Play : PageModel
         if (x != null && y != null && initX != null && initY != null &&
             x == initX && y == initY)
         {
-            return RedirectToPage("Play", new { id = Game.Id , playerNo = PlayerNo});
+            return RedirectToPage("Play", new { id = Game.Id, playerNo = PlayerNo });
         }
 
         CheckIfMakeAnotherTake();
@@ -141,15 +142,11 @@ public class Play : PageModel
     // Check if there is a checker that has preformed a take in previous move. If this checker can preform another
     private void CheckIfMakeAnotherTake()
     {
-        if (GameState.CheckerThatPreformedTakingX != null && GameState.CheckerThatPreformedTakingY != null)
-        {
-            if (Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
-                    (int)GameState.CheckerThatPreformedTakingY))
-            {
-                FirstReq = true;
-                InitX = GameState.CheckerThatPreformedTakingX;
-                InitY = GameState.CheckerThatPreformedTakingY;
-            }
-        }
+        if (GameState.CheckerThatPreformedTakingX == null || GameState.CheckerThatPreformedTakingY == null) return;
+        if (!Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
+                (int)GameState.CheckerThatPreformedTakingY)) return;
+        FirstReq = true;
+        InitX = GameState.CheckerThatPreformedTakingX;
+        InitY = GameState.CheckerThatPreformedTakingY;
     }
 }

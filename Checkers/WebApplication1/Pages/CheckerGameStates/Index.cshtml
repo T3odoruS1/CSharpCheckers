@@ -5,28 +5,34 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Game state list</h1>
 
-<p>
-    @* <a asp-page="Create">Create New</a> *@
-</p>
+<form method="post">
+    <select name="id" asp-items="Model.GameSelectList" class="form-select"></select>
+    <button class="btn btn-primary submit-button" type="submit"> Filter </button>
+</form>
+<form >
+    <button class="btn btn-primary submit-button" formaction="./CheckerGameStates">Disable filters</button>
+</form>
+
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckerGameState[0].CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckerGameState[0].NextMoveByBlack)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckerGameState[0].CheckerGame)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CheckerGameState[0].CreatedAt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CheckerGameState[0].NextMoveByBlack)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CheckerGameState[0].CheckerGame)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.CheckerGameState) {
+    @foreach (var item in Model.CheckerGameState)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedAt)
@@ -41,6 +47,6 @@
                 <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>
