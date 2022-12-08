@@ -2,7 +2,7 @@ using Domain;
 
 namespace DataAccessLayer;
 
-public interface IGameGameRepository
+public interface IGameRepository
 {
     // !!! Don't let players save games with duplicate names !!!
     

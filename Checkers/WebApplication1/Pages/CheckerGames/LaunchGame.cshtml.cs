@@ -7,10 +7,10 @@ namespace WebApplication1.Pages.CheckerGames;
 
 public class LaunchGame : PageModel
 {
-    private readonly IGameGameRepository _repo;
+    private readonly IGameRepository _repo;
 
 
-    public LaunchGame(IGameGameRepository repo)
+    public LaunchGame(IGameRepository repo)
     {
         _repo = repo;
     }

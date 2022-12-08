@@ -1,14 +1,17 @@
 @page
 @using GameBrain
 @using Microsoft.EntityFrameworkCore
+@using System.Text.Json
+@using DAL.FileSystem
+@using Domain
 @model WebApplication1.Pages.CheckerGames.Play
 
 @{
     ViewData["Title"] = "Play";
 }
-
+<h3 class="checker-counter"> White: @Model.Brain.CountCheckers(false)</h3>
+<h3 class="checker-counter"> Black: @Model.Brain.CountCheckers(true)</h3>
 <br/>
-
 <h2>
     @if (Model.WonByBlack == null)
     {
@@ -20,7 +23,7 @@
         </h2>
         <h2>
             Next move: @(!Model.Brain.NextMoveByBlack() ? $"Player One - {Model.Game.Player1Name} - White" :
-            $"Player Two - {Model.Game.Player2Name} - Black")
+                           $"Player Two - {Model.Game.Player2Name} - Black")
         </h2>
     }
     else
@@ -44,18 +47,7 @@
                     @if (!Model.FirstReq && Model.Board[x, y] != EGameSquareState.Unplayable &&
                          Model.Board[x, y] != EGameSquareState.Empty && Model.Brain.HasMoves(x, y))
                     {
-                        if (Model.Brain.NextMoveByBlack() && Model.PlayerNo == 1 &&
-                            (Model.Board[x, y] == EGameSquareState.Black ||
-                             Model.Board[x, y] == EGameSquareState.BlackKing))
-                        {
-                            <div class="clickable-div highlighted-div" onclick="window.
-                            location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y&playerNo=@Model.PlayerNo'">
-                                @GetCellContents(Model.Board[x, y])
-                            </div>
-                        }
-                        else if (!Model.Brain.NextMoveByBlack() && Model.PlayerNo == 0 &&
-                                 (Model.Board[x, y] == EGameSquareState.White ||
-                                  Model.Board[x, y] == EGameSquareState.WhiteKing))
+                        if (Model.IsPlayerMove())
                         {
                             <div class="clickable-div highlighted-div" onclick="window.
                             location = '/CheckerGames/Play?id=@Model.Game.Id&firstReq=1&x=@x&y=@y&playerNo=@Model.PlayerNo'">
@@ -69,10 +61,11 @@
                             </div>
                         }
                     }
-                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null)
+                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null && Model.IsPlayerMove())
                     {
                         if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y) ||
-                            (x == Model.InitX && y == Model.InitY))
+                            (x == Model.InitX && y == Model.InitY && !(Model.GameState.CheckerThatPreformedTakingX != null &&
+                                                                       Model.Game.GameOptions!.TakingIsMandatory)))
                         {
                             <div class="clickable-div highlighted-div active-checker-div" onclick="window.
                             location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY&playerNo=@Model.PlayerNo'">
@@ -101,11 +94,18 @@
     }
 </table>
 
+@if (!Model.Game.GameOptions!.TakingIsMandatory && Model.GameState.CheckerThatPreformedTakingY != null && Model.IsPlayerMove())
+{
+    <button onclick="window.location = '/CheckerGames/Play?id=@Model.Game.Id&playerNo=@Model.PlayerNo&pass=1'">
+        Pass the taking move
+    </button>
+}
+
 
 
 @section Scripts
 {
-    @if (!IsPlayerMove())
+    @if (!Model.IsPlayerMove())
     {
         <script>
             setTimeout(()=>{
@@ -160,11 +160,8 @@
         {
             return Model.Game.Player1Name + " - White";
         }
-        else
-        {
-            return Model.Game.Player2Name + " - Black";
-        }
-       
+        
+        return Model.Game.Player2Name + " - Black";
     }
 
     string GetPlayerMoveStatus()
@@ -180,17 +177,7 @@
         return "Please wait for opponents move";
     }
 
-    bool IsPlayerMove()
-    {
-        if (Model.PlayerNo == 0 && !Model.GameState.NextMoveByBlack)
-        {
-            return true;
-        }if (Model.PlayerNo == 1 && Model.GameState.NextMoveByBlack)
-        {
-            return true;
-        }
-        return false;
-    }
 
+    
 
 }

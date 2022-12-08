@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 using Domain;
 
 namespace GameBrain;
@@ -157,21 +158,19 @@ public class CheckersBrain
                 // Check if there is checker to take.
                 if (_gameBoard[iniX, iniY] == EGameSquareState.Black)
                 {
-                    if ((_gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.White ||  
-                         _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.WhiteKing)&&
+                    if ((_gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.White ||
+                         _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.WhiteKing) &&
                         _gameBoard[destX, destY] == EGameSquareState.Empty)
                     {
-
                         return true;
                     }
                 }
                 else if (_gameBoard[iniX, iniY] == EGameSquareState.White)
                 {
                     if ((_gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.Black ||
-                        _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.BlackKing) &&
+                         _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] == EGameSquareState.BlackKing) &&
                         _gameBoard[destX, destY] == EGameSquareState.Empty)
                     {
-
                         return true;
                     }
                 }
@@ -266,12 +265,10 @@ public class CheckersBrain
                 if (_canDoAnotherTake)
                 {
                     return counts.Item1 == 1 && counts.Item2 == 0;
-
                 }
                 else
                 {
                     return counts.Item1 <= 1 && counts.Item2 == 0;
-
                 }
             }
         }
@@ -281,7 +278,6 @@ public class CheckersBrain
 
     public void TestIfGameOver()
     {
-
         var whiteCount = 0;
         var blackCount = 0;
         for (int y = 0; y < _gameBoard.GetLength(1); y++)
@@ -304,19 +300,20 @@ public class CheckersBrain
         {
             _gameOver = true;
             _gameWonByBlack = true;
-        }if (blackCount == 0)
+        }
+
+        if (blackCount == 0)
         {
             _gameOver = true;
             _gameWonByBlack = false;
         }
-
     }
 
     public bool IsGameOver()
     {
         return _gameOver;
     }
-    
+
     public bool GameWonByBlack()
     {
         return _gameWonByBlack;
@@ -437,7 +434,6 @@ public class CheckersBrain
     {
         if (_gameBoard[x, y] == EGameSquareState.Black || _gameBoard[x, y] == EGameSquareState.White)
         {
-            
             try
             {
                 if (MoveIsPossible(x, y, x - 2, y - 2))
@@ -448,8 +444,36 @@ public class CheckersBrain
 
                 try
                 {
-                    return MoveIsPossible(x, y, x + 2, y - 2);
+                    if (MoveIsPossible(x, y, x + 2, y - 2))
+                    {
+                        return true;
+                    }
+
+                    try
+                    {
+                        if (MoveIsPossible(x, y, x + 2, y + 2))
+                        {
+                            return true;
+                        }
+
+                        try
+                        {
+                            if (MoveIsPossible(x, y, x - 2, y + 2))
+                            {
+                                return true;
+                            }
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            return false;
+                        }
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                    }
                 }
+
+
                 catch (IndexOutOfRangeException)
                 {
                     return false;
@@ -457,27 +481,11 @@ public class CheckersBrain
             }
             catch (IndexOutOfRangeException)
             {
-                try
-                {
-                    return MoveIsPossible(x, y, x + 2, y + 2);
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    try
-                    {
-                        return MoveIsPossible(x, y, x - 2, y + 2);
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        return false;
-                    }
-                }
             }
         }
 
         if (_gameBoard[x, y] == EGameSquareState.BlackKing || _gameBoard[x, y] == EGameSquareState.WhiteKing)
         {
-            
             for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
             {
                 for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
@@ -536,7 +544,6 @@ public class CheckersBrain
                 {
                     _canDoAnotherTake = true;
                 }
-                
             }
             else
             {
@@ -546,7 +553,6 @@ public class CheckersBrain
                 _canDoAnotherTake = false;
                 _takingDone = false;
             }
-            
 
 
             // Change regular checker into king
@@ -555,14 +561,13 @@ public class CheckersBrain
                 if (destY == 0)
                 {
                     _gameBoard[destX, destY] = EGameSquareState.BlackKing;
-                    if (CanTake(destX, destY) && !_nextMoveByBlack)
+                    if (CanTake(destX, destY) && !_nextMoveByBlack && _takingDone)
                     {
                         _nextMoveByBlack = true;
                         _canDoAnotherTake = true;
                     }
 
                     return;
-
                 }
             }
             else
@@ -570,11 +575,12 @@ public class CheckersBrain
                 if (destY == _gameBoard.GetLength(0) - 1)
                 {
                     _gameBoard[destX, destY] = EGameSquareState.WhiteKing;
-                    if (CanTake(destX, destY) && _nextMoveByBlack)
+                    if (CanTake(destX, destY) && _nextMoveByBlack && _takingDone)
                     {
                         _nextMoveByBlack = false;
                         _canDoAnotherTake = true;
                     }
+
                     return;
                 }
             }
@@ -593,7 +599,7 @@ public class CheckersBrain
                 _gameBoard[cords.Item1, cords.Item2] = EGameSquareState.Empty;
                 _gameBoard[iniX, iniY] = EGameSquareState.Empty;
                 _takingDone = true;
-                
+
                 // Check if another taking can be made
                 if (!CanTake(destX, destY))
                 {
@@ -604,7 +610,6 @@ public class CheckersBrain
                 {
                     _canDoAnotherTake = true;
                 }
-
             }
             else
             {
@@ -615,9 +620,9 @@ public class CheckersBrain
                 _takingDone = false;
             }
         }
+
         TestIfGameOver();
     }
-
 
 
     public bool NextMoveByBlack()
@@ -633,5 +638,31 @@ public class CheckersBrain
     private static int Avg(int a, int b)
     {
         return (a + b) / 2;
+    }
+
+    public void ToggleNextMove()
+    {
+        _nextMoveByBlack = !_nextMoveByBlack;
+    }
+
+    public int CountCheckers(bool black)
+    {
+        int checkers = 0;
+        for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
+        {
+            for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
+            {
+                if (black && (_gameBoard[xi, yi] == EGameSquareState.Black ||
+                              _gameBoard[xi, yi] == EGameSquareState.BlackKing))
+                {
+                    checkers++;
+                }else if (!black && (_gameBoard[xi, yi] == EGameSquareState.White ||
+                                    _gameBoard[xi, yi] == EGameSquareState.WhiteKing))
+                {
+                    checkers++;
+                }
+            }
+        }
+        return checkers;
     }
 }

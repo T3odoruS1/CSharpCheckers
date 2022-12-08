@@ -10,12 +10,12 @@ namespace WebApplication1.Pages.CheckerGames;
 
 public class Play : PageModel
 {
-    private readonly IGameGameRepository _repo;
+    public readonly IGameRepository Repo;
 
 
-    public Play(IGameGameRepository repo)
+    public Play(IGameRepository repo)
     {
-        _repo = repo;
+        Repo = repo;
     }
 
 
@@ -27,12 +27,10 @@ public class Play : PageModel
     public int? InitX { get; set; }
     public int? InitY { get; set; }
     public bool FirstReq { get; set; }
-
     public bool? WonByBlack { get; set; }
-
     public int PlayerNo { get; set; }
 
-    public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY, int? playerNo)
+    public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY, int? playerNo, int? pass)
     {
         // Check if it is the first request(initial player choice)
         if (id == null)
@@ -42,9 +40,12 @@ public class Play : PageModel
 
         if (playerNo is null or < 0 or > 1)
         {
+            
             return RedirectToPage("/Index",
                 new { error = "No player number was provided or is not in allowed range." });
         }
+
+
 
         PlayerNo = playerNo.Value;
 
@@ -54,7 +55,7 @@ public class Play : PageModel
         }
 
 
-        Game = _repo.GetGameById(id.Value);
+        Game = Repo.GetGameById(id.Value);
 
         var options = Game.GameOptions;
 
@@ -63,10 +64,21 @@ public class Play : PageModel
             return NotFound();
         }
 
+        
+        
 
         // Get brain and state
         Brain = new CheckersBrain(options);
         GameState = Game.CheckerGameStates.Last();
+        var jsonString = GameState.SerializedGameBoard;
+        var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
+        Board = FsHelpers.JaggedTo2D(jagged!);
+        Brain.SetGameBoard(Board, GameState);
+        
+        if (pass != null)
+        {
+            PassTheTakingMove();
+        }
 
 
         if (firstReq != null && x != null && y != null)
@@ -77,15 +89,13 @@ public class Play : PageModel
 
 
         // Unserialize json game board. Get game board.
-        var jsonString = GameState.SerializedGameBoard;
-        var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
-        Board = FsHelpers.JaggedTo2D(jagged!);
-        Brain.SetGameBoard(Board, GameState);
+
         if (Game.GameOverAt != null)
         {
             WonByBlack = Game.GameWonBy == Game.Player2Name;
-            return Page();
+            
         }
+
 
         // Check if player wants to switch the checker that he wants to use
         if (x != null && y != null && initX != null && initY != null &&
@@ -101,25 +111,8 @@ public class Play : PageModel
 
 
         Brain.MoveChecker((int)initX, (int)initY, (int)x, (int)y);
-        var newState = new CheckerGameState
-        {
-            SerializedGameBoard = JsonSerializer.Serialize(
-                FsHelpers.ToJaggedArray(Brain.GetBoard())),
-            NextMoveByBlack = Brain.NextMoveByBlack()
-        };
-        // Check if taking was preformed
 
-        if (Brain.TakingDone() && Brain.CanTake((int)x, (int)y))
-        {
-            // If taking was preformed mark which checker was doing it.
-            newState.CheckerThatPreformedTakingX = x;
-            newState.CheckerThatPreformedTakingY = y;
-        }
-        else
-        {
-            FirstReq = false;
-        }
-
+        var newState = CreateNewState(x.Value, y.Value, false);
         Game.CheckerGameStates.Add(newState);
         GameState = newState;
         CheckIfMakeAnotherTake();
@@ -129,7 +122,7 @@ public class Play : PageModel
             Game.GameOverAt = DateTime.Now;
         }
 
-        _repo.UpdateGame(Game);
+        Repo.UpdateGame(Game);
         if (Game.GameOverAt != null)
         {
             WonByBlack = Game.GameWonBy == Game.Player2Name;
@@ -142,11 +135,68 @@ public class Play : PageModel
     // Check if there is a checker that has preformed a take in previous move. If this checker can preform another
     private void CheckIfMakeAnotherTake()
     {
-        if (GameState.CheckerThatPreformedTakingX == null || GameState.CheckerThatPreformedTakingY == null) return;
+        if (GameState.CheckerThatPreformedTakingX == null || GameState.CheckerThatPreformedTakingY == null || !IsPlayerMove()) return;
         if (!Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
                 (int)GameState.CheckerThatPreformedTakingY)) return;
         FirstReq = true;
         InitX = GameState.CheckerThatPreformedTakingX;
         InitY = GameState.CheckerThatPreformedTakingY;
     }
+    
+    public bool IsPlayerMove()
+    {
+        if (PlayerNo == 0 && !GameState.NextMoveByBlack)
+        {
+            return true;
+        }if (PlayerNo == 1 && GameState.NextMoveByBlack)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    // Construct new game state using information provided inside this class. 
+    // Parameter pass is used to pass a move to the next player in case that taking is not mandatory
+    // and the player wants to stop taking spree.
+    private CheckerGameState CreateNewState(int x, int y, bool pass)
+    {
+        var newState = new CheckerGameState
+        {
+            SerializedGameBoard = JsonSerializer.Serialize(
+                FsHelpers.ToJaggedArray(Brain.GetBoard())),
+            NextMoveByBlack = !pass ? Brain.NextMoveByBlack() : !Brain.NextMoveByBlack()
+        };
+        // Check if taking was preformed
+
+        if (Brain.TakingDone() && Brain.CanTake(x, y))
+        {
+            // If taking was preformed mark which checker was doing it.
+            newState.CheckerThatPreformedTakingX = x;
+            newState.CheckerThatPreformedTakingY = y;
+        }
+        else
+        {
+            FirstReq = false;
+        }
+
+        return newState;
+    }
+    
+    private void PassTheTakingMove()
+    {
+        var newState = new CheckerGameState
+        {
+            SerializedGameBoard = JsonSerializer.Serialize(
+                FsHelpers.ToJaggedArray(Brain.GetBoard())),
+            NextMoveByBlack = !Brain.NextMoveByBlack()
+        };
+        Game.CheckerGameStates!.Add(newState);
+        Repo.UpdateGame(Game);
+        Brain.ToggleNextMove();
+        GameState = newState;
+    }
+    
+    
 }

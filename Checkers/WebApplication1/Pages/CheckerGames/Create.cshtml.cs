@@ -19,9 +19,9 @@ namespace WebApplication1.Pages.CheckerGames
     public class CreateModel : PageModel
     {
         private DAL.Db.AppDbContext _context;
-        private IGameGameRepository _repository;
+        private IGameRepository _repository;
 
-        public CreateModel(DAL.Db.AppDbContext context, IGameGameRepository repository)
+        public CreateModel(DAL.Db.AppDbContext context, IGameRepository repository)
         {
             _context = context;
             _repository = repository;
@@ -53,7 +53,9 @@ namespace WebApplication1.Pages.CheckerGames
             var state = new CheckerGameState();
             var brain = new CheckersBrain(options);
             state.SerializedGameBoard = JsonSerializer.Serialize(FsHelpers.ToJaggedArray(brain.GetBoard()));
+            
             CheckerGame.CheckerGameStates = new List<CheckerGameState>();
+            
             CheckerGame.CheckerGameStates.Add(state);
             options.GameCount++;
             _context.CheckerGameOptions.Update(options);

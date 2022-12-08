@@ -1,5 +1,6 @@
 ﻿
 using System.Text.Json;
+using CheckersApp;
 using ConsoleUI;
 using DAL.Db;
 using DAL.FileSystem;
@@ -28,8 +29,8 @@ var lastUsedRepoFs = new GameOptionsLastUsedFileSystem();
 
 var lastUsedRepo = lastUsedRepoFs;
 
-IGameGameRepository gameRepoFs = new GameRepositoryFileSystem();
-IGameGameRepository gameRepoDb = new GameRepositoryDatabase(ctx);
+IGameRepository gameRepoFs = new GameRepositoryFileSystem();
+IGameRepository gameRepoDb = new GameRepositoryDatabase(ctx);
 
 var gameRepo = gameRepoDb;
 
@@ -215,14 +216,9 @@ string LoadGame()
           {
                var gameToBeLoaded = gameRepo.GetGameByName(gameDict[a]);
                gameOptions = gameToBeLoaded.GameOptions;
-               Console.WriteLine(gameToBeLoaded);
-               UI.DrawGameBoard(FsHelpers.JaggedTo2D(
-                    JsonSerializer.
-                         Deserialize<EGameSquareState[][]>(gameToBeLoaded
-                              .CheckerGameStates!
-                              .Last()
-                              .SerializedGameBoard)!), null, null);
-               
+               var gameRunner = new GameRunner(gameRepo, gameToBeLoaded.Id);
+               gameRunner.RunGame();
+
           }
      
      }

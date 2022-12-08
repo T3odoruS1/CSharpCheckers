@@ -12,35 +12,36 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckerGame[0].Name)
-            </th>
-            <th>
-                Started at
-            </th>
-            <th>
-                Game over at
-            </th>
-            <th>
-                Game won by
-            </th>
-            <th>
-                Player 1 name
-            </th>
-            <th>
-               Player 1 type
-            </th>
-            <th>
-                Player 2 name
-            </th>
-            <th>
-                Player 2 type
-            </th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CheckerGame[0].Name)
+        </th>
+        <th>
+            Started at
+        </th>
+        <th>
+            Game over at
+        </th>
+        <th>
+            Game won by
+        </th>
+        <th>
+            Player 1 name
+        </th>
+        <th>
+            Player 1 type
+        </th>
+        <th>
+            Player 2 name
+        </th>
+        <th>
+            Player 2 type
+        </th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.CheckerGame) {
+    @foreach (var item in Model.CheckerGame)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -55,22 +56,27 @@
                 @Html.DisplayFor(modelItem => item.GameWonBy)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Player1Name)
+                Play as:
+                <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="0">@Html.DisplayFor(modelItem => item.Player1Name)</a>
+
+
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Player1Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Player2Name)
+                Play as:
+
+                <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="1">@Html.DisplayFor(modelItem => item.Player2Name)</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Player2Type)
             </td>
             <td>
-                <a asp-page="./LaunchGame" asp-route-id="@item.Id">Play</a> |
+                
                 <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>

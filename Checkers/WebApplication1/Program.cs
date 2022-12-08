@@ -14,7 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
-builder.Services.AddScoped<IGameGameRepository, GameRepositoryDatabase>();
+builder.Services.AddScoped<IGameRepository, GameRepositoryDatabase>();
 // builder.Services.AddScoped<IGameOptionRepository, GameOptionsRepositoryDatabase>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

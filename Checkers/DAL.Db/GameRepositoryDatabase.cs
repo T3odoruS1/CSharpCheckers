@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Db;
 
-public class GameRepositoryDatabase : IGameGameRepository
+public class GameRepositoryDatabase : IGameRepository
 {
     public string Name { get; set; } = FsHelpers.DatabaseIdentifier;
     

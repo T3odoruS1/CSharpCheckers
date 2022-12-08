@@ -4,7 +4,7 @@ using Domain;
 
 namespace DAL.FileSystem;
 
-public class GameRepositoryFileSystem : IGameGameRepository
+public class GameRepositoryFileSystem : IGameRepository
 {
     private const string FileExtension = "json";
     private readonly string _gameDir = "." + 
