@@ -36,21 +36,19 @@ public class GameRunner
         {
             var state = _game.CheckerGameStates.Last();
             _brain = new CheckersBrain(options);
-            state = _game.CheckerGameStates.Last();
-            var jsonString = state.SerializedGameBoard;
-            var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
-            var board = FsHelpers.JaggedTo2D(jagged!);
+            state = GetPreparedBoard(out var board);
             _brain.SetGameBoard(board, state);
             Console.Clear();
-            // if (state.NextMoveByBlack)
-            // {
-            //     Console.WriteLine("Next move by black");
-            //     
-            // }else if (!state.NextMoveByBlack)
-            // {
-            //     Console.WriteLine("Next move by white");
-            // }
-            MakeAMoveBy(state.NextMoveByBlack);
+
+            if (_game.GameWonBy == null)
+            {
+                MakeAMoveBy(state.NextMoveByBlack);    
+            }
+            else
+            {
+                Console.WriteLine($"Game won by {_game.GameWonBy}");
+            }
+            
 
 
             Console.WriteLine("Press X to exit");
@@ -60,6 +58,16 @@ public class GameRunner
                 exit = true;
             }
         } while (!exit);
+    }
+
+    private CheckerGameState GetPreparedBoard(out EGameSquareState[,] board)
+    {
+        CheckerGameState state;
+        state = _game.CheckerGameStates!.Last();
+        var jsonString = state.SerializedGameBoard;
+        var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
+        board = FsHelpers.JaggedTo2D(jagged!);
+        return state;
     }
 
     private void MakeAMoveBy(bool nextMoveByBlack)
@@ -160,6 +168,16 @@ public class GameRunner
             {
                 continue;
             }
+            if (_brain.IsGameOver())
+            {
+                _game.GameWonBy = _brain.GameWonByBlack() ? _game.Player2Name : _game.Player1Name;
+                _game.GameOverAt = DateTime.Now;
+            }
+
+            if (_game.GameWonBy != null)
+            {
+                Console.WriteLine($"Game won by: {_game.GameWonBy}");
+            }
             UI.DrawGameBoard(_brain.GetBoard(), null, null);
             var newState = CreateNewState(destX, destX, false);
             _game.CheckerGameStates!.Add(newState);
@@ -203,5 +221,5 @@ public class GameRunner
     }
 
 
-    // Implement switch player switch chair system for the console app.
+   
 }
