@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using DAL.Db;
 using DAL.FileSystem;
 using DataAccessLayer;
 using Domain;
 using GameBrain;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WebApplication1.Pages.CheckerGames
@@ -33,7 +26,8 @@ namespace WebApplication1.Pages.CheckerGames
             return Page();
         }
 
-        [BindProperty] public CheckerGame CheckerGame { get; set; } = default!;
+        [BindProperty] 
+        public CheckerGame CheckerGame { get; set; } = default!;
 
         public SelectList OptionsSelectList { get; set; } = default!;
 
@@ -41,7 +35,7 @@ namespace WebApplication1.Pages.CheckerGames
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public IActionResult OnPostAsync()
         {
-            if (!ModelState.IsValid || _context.CheckerGames == null || CheckerGame == null)
+            if (!ModelState.IsValid)
             {
                 return Page();
             }

@@ -14,10 +14,10 @@ public class GameRunner
     private  CheckersBrain _brain = default!;
 
 
-    public GameRunner(IGameRepository repo, int id)
+    public GameRunner(IGameRepository repo, CheckerGame game)
     {
         _repo = repo;
-        _game = repo.GetGameById(id);
+        _game = game;
     }
 
     public void RunGame()
@@ -34,9 +34,8 @@ public class GameRunner
         var exit = false;
         do
         {
-            var state = _game.CheckerGameStates.Last();
             _brain = new CheckersBrain(options);
-            state = GetPreparedBoard(out var board);
+            var state = GetPreparedBoard(out var board);
             _brain.SetGameBoard(board, state);
             Console.Clear();
 
@@ -74,64 +73,15 @@ public class GameRunner
     {
         
 
-        var choiceIsValid = false;
 
         int x = -1;
         int y = -1;
-        do
-        {
-            Console.Clear();
-            PrintNextPlayer(nextMoveByBlack);
-            
-            UI.DrawGameBoard(_brain.GetBoard(), null, null);
-            Console.WriteLine("Choose a checker to move");
-            Console.WriteLine("Enter checker row: ");
-            
-            // TODO validation
-            var userXChoice = Console.ReadLine();
-            if (!int.TryParse(userXChoice, out var xi))
-            {
-                continue;
-            }
-
-            xi -= 1;
-             
-            Console.WriteLine("Enter checker column: ");
-            
-            // TODO validation
-            var userYChoice = Console.ReadLine();
-            if (!int.TryParse(userYChoice, out var yi))
-            {
-                continue;
-            }
-
-            yi -= 1;
-            if (xi > _brain.GetBoard().GetLength(1) || yi > _brain.GetBoard().GetLength(0))
-            {
-                continue;
-            }
-
-            try
-            {
-                if (!_brain.HasMoves(xi, yi))
-                {
-                    Console.WriteLine(
-                        "Checker that you picked does not have any valid moves. You have to chose another one");
-                    continue;
-                }
-            }
-            catch (IndexOutOfRangeException)
-            {
-                continue;
-            }
-            
-
-            x = xi;
-            y = yi;
-            choiceIsValid = true;
-        } while (!choiceIsValid);
-
         
+        
+        // Ask user which checker to move and preform required validation
+        x = PreformInitialCheckerChoice(nextMoveByBlack, x, ref y);
+
+
         var destIsValid = false;
         do
         {
@@ -161,8 +111,49 @@ public class GameRunner
             
             if (_brain.MoveIsPossible(x, y, destX, destY))
             {
-                destIsValid = true;
+                // Move
                 _brain.MoveChecker(x, y, destX, destY);
+
+                // Create new game state
+                var newState = CreateNewState(destX, destY, false);
+
+                // If possible to make another take then allow
+                if (newState.CheckerThatPreformedTakingX != null)
+                {
+                    if (!_game.GameOptions!.TakingIsMandatory)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("In with game options in this game the taking is not mandatory. You can press x" +
+                                          "to stop taking or any other button to continue.");
+                        UI.DrawGameBoard(_brain.GetBoard(), null, null);
+
+                        var key = Console.ReadKey(true).Key;
+                        if (key == ConsoleKey.X)
+                        {
+                            destIsValid = true;
+                            newState.NextMoveByBlack = !nextMoveByBlack;
+                        }
+                        else
+                        {
+                            x = destX;
+                            y = destY;
+                        }
+                        
+
+                    }else
+                    {
+                        x = destX;
+                        y = destY;
+                    }
+                }
+                else
+                {
+                    destIsValid = true;
+                }
+                Console.Clear();
+                UI.DrawGameBoard(_brain.GetBoard(), null, null);
+                _game.CheckerGameStates!.Add(newState);
+                _repo.UpdateGame(_game);
             }
             else
             {
@@ -178,12 +169,71 @@ public class GameRunner
             {
                 Console.WriteLine($"Game won by: {_game.GameWonBy}");
             }
-            UI.DrawGameBoard(_brain.GetBoard(), null, null);
-            var newState = CreateNewState(destX, destX, false);
-            _game.CheckerGameStates!.Add(newState);
-            _repo.UpdateGame(_game);
+            
 
         } while (!destIsValid);
+    }
+
+    private int PreformInitialCheckerChoice(bool nextMoveByBlack, int x, ref int y)
+    {
+        var choiceIsValid = false;
+
+        do
+        {
+            Console.Clear();
+            PrintNextPlayer(nextMoveByBlack);
+
+            UI.DrawGameBoard(_brain.GetBoard(), null, null);
+            Console.WriteLine("Choose a checker to move");
+            Console.WriteLine("Enter checker row: ");
+
+            var userXChoice = Console.ReadLine();
+            if (!int.TryParse(userXChoice, out var xi))
+            {
+                continue;
+            }
+
+            xi -= 1;
+
+            Console.WriteLine("Enter checker column: ");
+
+            var userYChoice = Console.ReadLine();
+            if (!int.TryParse(userYChoice, out var yi))
+            {
+                continue;
+            }
+
+            yi -= 1;
+            if (xi > _brain.GetBoard().GetLength(1) || yi > _brain.GetBoard().GetLength(0))
+            {
+                continue;
+            }
+
+            try
+            {
+                if (!_brain.HasMoves(xi, yi) || 
+                    !nextMoveByBlack &&
+                     (_brain.GetBoard()[xi, yi] == EGameSquareState.Black ||
+                      _brain.GetBoard()[xi, yi] == EGameSquareState.BlackKing) || 
+                     nextMoveByBlack && 
+                     (_brain.GetBoard()[xi, yi] == EGameSquareState.White ||
+                       _brain.GetBoard()[xi, yi] == EGameSquareState.WhiteKing))
+                {
+                    continue;
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                continue;
+            }
+
+
+            x = xi;
+            y = yi;
+            choiceIsValid = true;
+        } while (!choiceIsValid);
+
+        return x;
     }
 
     private void PrintNextPlayer(bool nextMoveByBlack)

@@ -32,6 +32,11 @@ public class Play : PageModel
 
     public IActionResult OnGet(int? id, int? firstReq, int? x, int? y, int? initX, int? initY, int? playerNo, int? pass)
     {
+
+        #region Initial page initialization
+
+        
+
         // Check if it is the first request(initial player choice)
         if (id == null)
         {
@@ -75,6 +80,9 @@ public class Play : PageModel
         Board = FsHelpers.JaggedTo2D(jagged!);
         Brain.SetGameBoard(Board, GameState);
         
+        #endregion
+
+        
         if (pass != null)
         {
             PassTheTakingMove();
@@ -110,7 +118,7 @@ public class Play : PageModel
         if (firstReq != null || x == null || y == null || initX == null || initY == null) return Page();
 
 
-        Brain.MoveChecker((int)initX, (int)initY, (int)x, (int)y);
+        Brain.MoveChecker(initX.Value, initY.Value, x.Value, y.Value);
 
         var newState = CreateNewState(x.Value, y.Value, false);
         Game.CheckerGameStates.Add(newState);
@@ -136,8 +144,8 @@ public class Play : PageModel
     private void CheckIfMakeAnotherTake()
     {
         if (GameState.CheckerThatPreformedTakingX == null || GameState.CheckerThatPreformedTakingY == null || !IsPlayerMove()) return;
-        if (!Brain.CanTake((int)GameState.CheckerThatPreformedTakingX,
-                (int)GameState.CheckerThatPreformedTakingY)) return;
+        if (!Brain.CanTake(GameState.CheckerThatPreformedTakingX.Value,
+                GameState.CheckerThatPreformedTakingY.Value)) return;
         FirstReq = true;
         InitX = GameState.CheckerThatPreformedTakingX;
         InitY = GameState.CheckerThatPreformedTakingY;
@@ -196,6 +204,18 @@ public class Play : PageModel
         Repo.UpdateGame(Game);
         Brain.ToggleNextMove();
         GameState = newState;
+    }
+
+    public bool CurrentPlayerIsAi()
+    {
+        switch (PlayerNo)
+        {
+            case 0 when !Brain.NextMoveByBlack() && Game.Player1Type == EPlayerType.Ai:
+            case 1 when !Brain.NextMoveByBlack() && Game.Player1Type == EPlayerType.Ai:
+                return true;
+            default:
+                return false;
+        }
     }
     
     

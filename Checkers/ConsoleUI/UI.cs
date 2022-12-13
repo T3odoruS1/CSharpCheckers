@@ -68,7 +68,7 @@ public static class UI
                     default:
                         throw new ArgumentException("Invalid choice for square choice: " + board[j, i]);
                 }
-                // Console.ResetColor();
+                Console.ResetColor();
 
             }
     

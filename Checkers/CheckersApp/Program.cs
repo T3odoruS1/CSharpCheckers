@@ -78,7 +78,7 @@ var mainMenu = new Menu(EMenuLevel.Main,
      {
           new MenuItem("N", "New Game 🎮", DoNewGame),
           new MenuItem("L", "Load Game 💿", LoadGame),
-          new MenuItem("D", "Delete SavedGame 🗑️", DeleteSavedGame),
+          new MenuItem("D", "Delete Saved Game 🗑️", DeleteSavedGame),
 
           new MenuItem("O", "Options ⚙️", secondMenu.RunMenu)
      });
@@ -216,7 +216,7 @@ string LoadGame()
           {
                var gameToBeLoaded = gameRepo.GetGameByName(gameDict[a]);
                gameOptions = gameToBeLoaded.GameOptions;
-               var gameRunner = new GameRunner(gameRepo, gameToBeLoaded.Id);
+               var gameRunner = new GameRunner(gameRepo, gameToBeLoaded);
                gameRunner.RunGame();
 
           }
@@ -351,7 +351,9 @@ string DoNewGame()
 
      gameRepo.SavaGame(newGame);
      Console.WriteLine($"Game: {newGame}");
-     WaitForUserInput();
+     
+     var gameRunner = new GameRunner(gameRepo, newGame);
+     gameRunner.RunGame();
 
 
      return "B";
