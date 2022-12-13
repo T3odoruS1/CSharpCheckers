@@ -11,18 +11,17 @@ public interface IGameOptionRepository
     public string Name { get; set; }
     
     // Read all game Options and return their filenames
-    List<string> GetGameOptionsList();
+    List<CheckerGameOptions> GetGameOptionsList();
     
     // Get game Option by string id(filename)
-    CheckerGameOptions GetGameOptions(string optionName);
+    CheckerGameOptions GetOptionsById(int id);
     
     // Create and update
-    void SaveGameOptions(CheckerGameOptions options);
+    int SaveGameOptions(CheckerGameOptions options);
     
     // Delete
-    void DeleteGameOptions(string optionName);
+    void DeleteOptionsById(int id);
 
     void UpdateGameOptions(CheckerGameOptions options);
 
-    public bool OptionNameAvailable(string name);
 }

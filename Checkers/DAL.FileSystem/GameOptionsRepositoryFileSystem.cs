@@ -17,23 +17,23 @@ public class GameOptionsRepositoryFileSystem : IGameOptionRepository
     
     
     
-    public List<string> GetGameOptionsList()
+    public List<CheckerGameOptions> GetGameOptionsList()
     {
         FsHelpers.CheckOrCreateDirectory(_optionsDir);
         
-        var res = new List<string>();
+        var res = new List<CheckerGameOptions>();
         foreach (var fileName in Directory.GetFileSystemEntries(
                      _optionsDir, "*" + FileExtension))
         {
-            res.Add(Path.GetFileNameWithoutExtension(fileName));
+            res.Add(GetOptionsById(Int32.Parse(fileName)));
         }
 
         return res;
     }
 
-    public CheckerGameOptions GetGameOptions(string optionName)
+    public CheckerGameOptions GetOptionsById(int id)
     {
-        var fileContent = File.ReadAllText(FsHelpers.GetFileName(optionName, _optionsDir));
+        var fileContent = File.ReadAllText(FsHelpers.GetFileName(id.ToString(), _optionsDir));
         var options = JsonSerializer.Deserialize<CheckerGameOptions>(fileContent);
 
         if (options == null)
@@ -44,20 +44,19 @@ public class GameOptionsRepositoryFileSystem : IGameOptionRepository
         return options;
     }
 
-    public void SaveGameOptions(CheckerGameOptions options)
+    public int SaveGameOptions(CheckerGameOptions options)
     {
-        if (!OptionNameAvailable(options.Name))
-        {
-            throw new ArgumentException($"Error while saving game options. Game options name {options.Name} is already taken");
-        }
+        options.Id = Guid.NewGuid().GetHashCode();
+
         FsHelpers.CheckOrCreateDirectory(_optionsDir);
         var fileContent = JsonSerializer.Serialize(options);
-        File.WriteAllText(FsHelpers.GetFileName(options.Name, _optionsDir), fileContent);
+        File.WriteAllText(FsHelpers.GetFileName(options.Id.ToString(), _optionsDir), fileContent);
+        return options.Id;
     }
 
-    public void DeleteGameOptions(string optionName)
+    public void DeleteOptionsById(int id)
     {
-        File.Delete(FsHelpers.GetFileName(optionName, _optionsDir));
+        File.Delete(FsHelpers.GetFileName(id.ToString(), _optionsDir));
 
     }
 
@@ -65,12 +64,6 @@ public class GameOptionsRepositoryFileSystem : IGameOptionRepository
     {
         FsHelpers.CheckOrCreateDirectory(_optionsDir);
         var fileContent = JsonSerializer.Serialize(options);
-        File.WriteAllText(FsHelpers.GetFileName(options.Name, _optionsDir), fileContent);
-    }
-    
-
-    public bool OptionNameAvailable(string name)
-    {
-        return !GetGameOptionsList().Contains(name);
+        File.WriteAllText(FsHelpers.GetFileName(options.Id.ToString(), _optionsDir), fileContent);
     }
 }

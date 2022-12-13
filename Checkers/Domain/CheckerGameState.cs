@@ -26,4 +26,39 @@ public class CheckerGameState
     {
         return $"Next move by black: {NextMoveByBlack}, PreformedX: {CheckerThatPreformedTakingX}, PreformedY: {CheckerThatPreformedTakingY}";
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (GetType() != obj!.GetType())
+        {
+            return false;
+        }
+
+        var other = (CheckerGameState)obj;
+        return Equals(other);
+    }
+
+    private bool Equals(CheckerGameState other)
+    {
+        return Id == other.Id &&
+               CreatedAt.Equals(other.CreatedAt) &&
+               NextMoveByBlack == other.NextMoveByBlack &&
+               SerializedGameBoard == other.SerializedGameBoard &&
+               CheckerThatPreformedTakingX == other.CheckerThatPreformedTakingX &&
+               CheckerThatPreformedTakingY == other.CheckerThatPreformedTakingY &&
+               CheckerGameId == other.CheckerGameId &&
+               Equals(CheckerGame, other.CheckerGame);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, 
+            CreatedAt, 
+            NextMoveByBlack, 
+            SerializedGameBoard, 
+            CheckerThatPreformedTakingX, 
+            CheckerThatPreformedTakingY, 
+            CheckerGameId, 
+            CheckerGame);
+    }
 }

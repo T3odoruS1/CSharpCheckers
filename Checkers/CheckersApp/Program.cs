@@ -1,5 +1,4 @@
-﻿
-using System.Text.Json;
+﻿using System.Text.Json;
 using CheckersApp;
 using ConsoleUI;
 using DAL.Db;
@@ -11,14 +10,10 @@ using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 using static System.ConsoleKey;
 
-var gameOptions = new CheckerGameOptions();
-
-/*
-Gameplay not implemented yet
-
- */
-
-
+var gameOptions = new CheckerGameOptions
+{
+     Name = "Default"
+};
 
 var dbOptions = new DbContextOptionsBuilder<AppDbContext>()
 .UseSqlite("Data Source=/Users/edgarvildt/Developer/CheckerDb/checker.db").Options;
@@ -44,7 +39,13 @@ CheckersBrain checkersBrain;
 gameOptions.Name = "Default";
 gameOptions.CheckerGames = new List<CheckerGame>();
 
+var dalTester = new DalTester();
 
+dalTester.TestDalFunctionality(
+     (GameRepositoryFileSystem)gameRepoFs, 
+     (GameRepositoryDatabase)gameRepoDb, 
+     (GameOptionsRepositoryFileSystem)optionRepoFs, 
+     (GameOptionsRepositoryDatabase)optionsRepoDb);
 
 #region MenuInitialization
 
@@ -92,7 +93,7 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 try
 {
-     gameOptions = optionRepo.GetGameOptions(lastUsedRepo.GetLastUsedOptions());
+     gameOptions = optionRepo.GetOptionsById(lastUsedRepo.GetLastUsedOptionsId());
 
 }
 catch (Exception)
@@ -102,7 +103,7 @@ catch (Exception)
 
 mainMenu.RunMenu();
 
-lastUsedRepo.NoteLastUsedOption(gameOptions.Name);
+lastUsedRepo.NoteLastUsedOptionId(gameOptions.Id);
 
 #endregion
 
@@ -137,17 +138,16 @@ string ChangeRepoType()
 string DeleteSavedGame()
 {
      Console.Clear();
-     var allSavedGames = gameRepo.GetAllGameNameList();
+     var allSavedGames = gameRepo.GetAllGamesList();
      var i = 1;
-     var gameDict = new Dictionary<int, string>();
+     var gameDict = new Dictionary<int, CheckerGame>();
      foreach (var savedGame in allSavedGames)
      {
-          var checkerGame = gameRepo.GetGameByName(savedGame);
           Console.WriteLine($"{i}) - {savedGame}");
-          Console.WriteLine($"Options : {checkerGame.GameOptions}");
+          Console.WriteLine($"Options : {savedGame.GameOptions}");
           var jaggedBoard =
                JsonSerializer.Deserialize<EGameSquareState[][]>(
-                    checkerGame.CheckerGameStates!
+                    savedGame.CheckerGameStates!
                          .Last()
                          .SerializedGameBoard);
           var gameBoard = FsHelpers.JaggedTo2D(jaggedBoard!);
@@ -169,10 +169,10 @@ string DeleteSavedGame()
      }
      else
      {
-          var gameToDelete = gameRepo.GetGameByName(gameDict[a]);
+          var gameToDelete = gameDict[a];
           gameToDelete.GameOptions!.GameCount--;
           optionRepo.UpdateGameOptions(gameToDelete.GameOptions);
-          gameRepo.DeleteGameByName(gameDict[a]);
+          gameRepo.DeleteGameById(gameToDelete.Id);
           
      }
      return "B";
@@ -180,18 +180,17 @@ string DeleteSavedGame()
 string LoadGame()
 {
      Console.Clear();
-     var allSavedGames = gameRepo.GetAllGameNameList();
+     var allSavedGames = gameRepo.GetAllGamesList();
      var i = 1;
-     var gameDict = new Dictionary<int, string>();
+     var gameDict = new Dictionary<int, CheckerGame>();
      foreach (var savedGame in allSavedGames)
      {
-          var checkerGame = gameRepo.GetGameByName(savedGame);
-          Console.WriteLine($"\n{i}) - {checkerGame.Name}");
+          Console.WriteLine($"\n{i}) - {savedGame.Name}");
           
-          Console.WriteLine(checkerGame.GameOptions);
+          Console.WriteLine(savedGame.GameOptions);
           var jaggedBoard =
                JsonSerializer.Deserialize<EGameSquareState[][]>(
-                    checkerGame.CheckerGameStates!
+                    savedGame.CheckerGameStates!
                          .Last()
                          .SerializedGameBoard);
           var gameBoard = FsHelpers.JaggedTo2D(jaggedBoard!);
@@ -214,9 +213,9 @@ string LoadGame()
           }
           else
           {
-               var gameToBeLoaded = gameRepo.GetGameByName(gameDict[a]);
+               var gameToBeLoaded = gameDict[a];
                gameOptions = gameToBeLoaded.GameOptions;
-               var gameRunner = new GameRunner(gameRepo, gameToBeLoaded);
+               var gameRunner = new GameRunner(gameRepo, gameToBeLoaded.Id);
                gameRunner.RunGame();
 
           }
@@ -262,8 +261,7 @@ string DoNewGame()
      } while (gameName == "" &&
               !(gameName.Length > 0) &&
               !(gameName.Length < 128) &&
-              gameName.Contains('"')&&
-              !gameRepo.GameNameAvailable(gameName));
+              gameName.Contains('"'));
 
      newGame.Name = gameName;
      // P1 name config
@@ -349,10 +347,10 @@ string DoNewGame()
      newGame.CheckerGameStates.Add(gameState);
      optionRepo.UpdateGameOptions(gameOptions);
 
-     gameRepo.SavaGame(newGame);
+     var id = gameRepo.SavaGame(newGame);
      Console.WriteLine($"Game: {newGame}");
      
-     var gameRunner = new GameRunner(gameRepo, newGame);
+     var gameRunner = new GameRunner(gameRepo, id);
      gameRunner.RunGame();
 
 
@@ -366,7 +364,7 @@ string DeleteOptions()
 {
      var optionToDelete = RunSubmenu();
      if (optionToDelete is "B" or "M" or "X") return optionToDelete;
-     var option = optionRepo.GetGameOptions(optionToDelete);
+     var option = optionRepo.GetOptionsById(Int32.Parse(optionToDelete));
      if (option.GameCount > 0)
      {
           Console.WriteLine("\nThere is a game that uses these options. You can not delete those.");
@@ -375,7 +373,7 @@ string DeleteOptions()
      }
      else
      {
-          optionRepo.DeleteGameOptions(optionToDelete);
+          optionRepo.DeleteOptionsById(Int32.Parse(optionToDelete));
           Console.Clear();
           Console.WriteLine("Deleted");
           WaitForUserInput();
@@ -411,8 +409,7 @@ string SaveCurrentOptions()
      {
           Console.WriteLine("Enter name for these options");
           userInputForFileName = Console.ReadLine()!; 
-     } while (userInputForFileName == "" || 
-              !optionRepo.OptionNameAvailable(userInputForFileName) ||
+     } while (userInputForFileName == "" ||
               userInputForFileName.Length is < 1 or > 128);
 
      gameOptions.Name = userInputForFileName;
@@ -444,7 +441,7 @@ string LoadGameOptions()
      
      var optionToLoad = RunSubmenu();
      if (optionToLoad is "B" or "M" or "X") return optionToLoad;
-     gameOptions = optionRepo.GetGameOptions(optionToLoad);
+     gameOptions = optionRepo.GetOptionsById(Int32.Parse(optionToLoad));
      Console.Clear();
      Console.WriteLine("Loaded!");
      WaitForUserInput();
@@ -452,28 +449,26 @@ string LoadGameOptions()
 }
 
 
-// Return option that user has chosen or the shortcut for navigating through the menu
+// Launches submenu where game options are elements and there are exit shortcuts. If player chose a game, the game Id
+// Is returned as string.
 string RunSubmenu()
 {
      
      var menuItems = new List<MenuItem>();
-     var i = 0;
-     var listOfOptions = new List<string>();
+     var listOfOptions = new List<CheckerGameOptions>();
      
      // For each option choice shortcut is a number in string form, other shortcuts are standard
      foreach (var gameOption in optionRepo.GetGameOptionsList())
      {
-          var option = optionRepo.GetGameOptions(gameOption);
-          menuItems.Add(new MenuItem(i.ToString(), 
-               option.Name + ":" + 
-               $"Height: {option.Height}," +
-               $" Width: {option.Width}," +
-               $" White starts: {option.WhiteStarts}," +
-               $" Taking mandatory: {option.TakingIsMandatory}," +
-               $" Amount of games: {option.GameCount}", 
+          menuItems.Add(new MenuItem(gameOption.Id.ToString(), 
+               gameOption.Name + ":" + 
+               $"Height: {gameOption.Height}," +
+               $" Width: {gameOption.Width}," +
+               $" White starts: {gameOption.WhiteStarts}," +
+               $" Taking mandatory: {gameOption.TakingIsMandatory}," +
+               $" Amount of games: {gameOption.GameCount}", 
                null));
           listOfOptions.Add(gameOption);
-          i++;
      }
      var loadMenu = new Menu(EMenuLevel.Other,
           ">  NB! You can delete only those games, that are not used in any games.  <", menuItems);
@@ -483,7 +478,7 @@ string RunSubmenu()
      
      // If user choice is number then return user choice return one of the options that he has chose.
      // Else return  user choice
-     return !int.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j];
+     return !int.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j].Id.ToString();
 }
 
 
@@ -586,8 +581,8 @@ void PrintOutAllSavedGameOptions()
      var i = 1;
      foreach (var option in optionsList)
      {
-          Console.WriteLine("\n"+i + ") " + option);
-          Console.WriteLine(optionRepo.GetGameOptions(option));
+          Console.WriteLine("\n"+i + ") " + option.Name);
+          Console.WriteLine(option);
           i++;
      }
 }

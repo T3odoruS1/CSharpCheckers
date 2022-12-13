@@ -27,5 +27,32 @@ public class CheckerGameOptions
                $"White starts: {WhiteStarts} \n" +
                $"Amount of games: {GameCount}";
     }
-    
+
+    public override bool Equals(object? obj)
+    {
+        if (GetType() != obj!.GetType())
+        {
+            return false;
+        }
+
+        var other = (CheckerGameOptions)obj;
+        return Equals(other);
+    }
+
+    private bool Equals(CheckerGameOptions other)
+    {
+        return Id == other.Id &&
+               Name == other.Name &&
+               Width == other.Width &&
+               Height == other.Height &&
+               TakingIsMandatory == other.TakingIsMandatory &&
+               WhiteStarts == other.WhiteStarts &&
+               Nullable.Equals(CheckerGames, other.CheckerGames) &&
+               GameCount == other.GameCount;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, Name, Width, Height, TakingIsMandatory, WhiteStarts, CheckerGames, GameCount);
+    }
 }

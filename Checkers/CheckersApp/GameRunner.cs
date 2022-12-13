@@ -14,10 +14,11 @@ public class GameRunner
     private  CheckersBrain _brain = default!;
 
 
-    public GameRunner(IGameRepository repo, CheckerGame game)
+    public GameRunner(IGameRepository repo, int id)
     {
         _repo = repo;
-        _game = game;
+        
+        _game = _repo.GetGameById(id);
     }
 
     public void RunGame()

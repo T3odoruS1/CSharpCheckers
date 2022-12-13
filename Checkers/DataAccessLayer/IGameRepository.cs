@@ -11,30 +11,21 @@ public interface IGameRepository
     
     
     // Return all game names
-    List<string> GetAllGameNameList();
+    List<CheckerGame> GetAllGamesList();
     
     
-    // Get game name by game name
-    CheckerGame GetGameByName(string name);
-
     CheckerGame GetGameById(int id);
     
     
     // Save game
-    void SavaGame(CheckerGame game);
+    int SavaGame(CheckerGame game);
 
     
     // Update game
     void UpdateGame(CheckerGame game);
-
-
-    
-    // Add new game state 
-    void AddNewGameState(CheckerGameState state);
     
     
     // Delete game from system by provided name
-    void DeleteGameByName(string name);
+    void DeleteGameById(int id);
 
-    public bool GameNameAvailable(string name);
 }

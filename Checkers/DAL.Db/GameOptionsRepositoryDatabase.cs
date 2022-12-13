@@ -16,36 +16,30 @@ public class GameOptionsRepositoryDatabase: IGameOptionRepository
         _dbContext = dbContext;
     }  
     
-    public List<string> GetGameOptionsList()
+    public List<CheckerGameOptions> GetGameOptionsList()
     {
         var res = _dbContext.CheckerGameOptions
             .Include(o => o.CheckerGames)
-            .OrderBy(o => o.Name)
-            .Select(o => o.Name)
             .ToList();
         return res;
     }
 
-    public CheckerGameOptions GetGameOptions(string optionName)
+    public CheckerGameOptions GetOptionsById(int id)
     {
         return _dbContext.CheckerGameOptions.
-            First(o => o.Name == optionName);
+            First(o => o.Id == id);
     }
 
-    public void SaveGameOptions(CheckerGameOptions options)
+    public int SaveGameOptions(CheckerGameOptions options)
     {
-        if (!OptionNameAvailable(options.Name))
-        {
-            throw new ArgumentException($"You tried to save options with name {options.Name}. That name is already used");
-        }
-
         _dbContext.CheckerGameOptions.Add(options);
         _dbContext.SaveChanges();
+        return options.Id;
     }
 
-    public void DeleteGameOptions(string optionName)
+    public void DeleteOptionsById(int id)
     {
-        var optionsFromDb = GetGameOptions(optionName);
+        var optionsFromDb = GetOptionsById(id);
         _dbContext.CheckerGameOptions.Remove(optionsFromDb);
         _dbContext.SaveChanges();
     }
@@ -66,11 +60,4 @@ public class GameOptionsRepositoryDatabase: IGameOptionRepository
 
     }
 
-    public bool OptionNameAvailable(string name)
-    {
-        var optionsFromDb = _dbContext.CheckerGameOptions.
-            FirstOrDefault(o => o.Name == name);
-        return optionsFromDb == null;
-    }
-    
 }

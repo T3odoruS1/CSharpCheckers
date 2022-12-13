@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Domain;
 
@@ -38,5 +39,49 @@ public class CheckerGame
                $"P1 name, type: {Player1Name}, {Player1Type}\n" +
                $"P2 name, type: {Player2Name}, {Player2Type}\n" +
                $"Game Options: {GameOptions}\n";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        
+        if (GetType() != obj!.GetType())
+        {
+            return false;
+        }
+
+        
+        var other = (CheckerGame)obj;
+        return Equals(other);
+    }
+
+    private bool Equals(CheckerGame other)
+    {
+        return Id == other.Id &&
+               Name == other.Name &&
+               StarterAt.Equals(other.StarterAt) &&
+               Nullable.Equals(GameOverAt, other.GameOverAt) &&
+               GameWonBy == other.GameWonBy &&
+               Player1Name == other.Player1Name &&
+               Player1Type == other.Player1Type &&
+               Player2Name == other.Player2Name &&
+               Player2Type == other.Player2Type;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Id);
+        hashCode.Add(Name);
+        hashCode.Add(StarterAt);
+        hashCode.Add(GameOverAt);
+        hashCode.Add(GameWonBy);
+        hashCode.Add(Player1Name);
+        hashCode.Add((int)Player1Type);
+        hashCode.Add(Player2Name);
+        hashCode.Add((int)Player2Type);
+        hashCode.Add(OptionsId);
+        hashCode.Add(GameOptions);
+        hashCode.Add(CheckerGameStates);
+        return hashCode.ToHashCode();
     }
 }

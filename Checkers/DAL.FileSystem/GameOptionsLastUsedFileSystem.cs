@@ -4,25 +4,23 @@ namespace DAL.FileSystem;
 
 public class GameOptionsLastUsedFileSystem : IGameOptionLastSave
 {
-    
-    private readonly string _lastOptDir = "." + 
-                                          Path.DirectorySeparatorChar 
+    private readonly string _lastOptDir = "." +
+                                          Path.DirectorySeparatorChar
                                           + "lastUsedOptName";
-    
+
     public string Name { get; set; } = FsHelpers.FileSystemIdentifier;
-    
-    public void NoteLastUsedOption(string optionName)
+
+    public void NoteLastUsedOptionId(int id)
     {
         FsHelpers.CheckOrCreateDirectory(_lastOptDir);
-        File.WriteAllText(FsHelpers.GetFileName("LastOption", _lastOptDir), optionName);    }
+        File.WriteAllText(FsHelpers.GetFileName("LastOption", _lastOptDir), id.ToString());
+    }
 
 
-    
+    public int GetLastUsedOptionsId()
+    {
+        var fileContent = File.ReadAllText(FsHelpers.GetFileName("LastOption", _lastOptDir));
 
-    public string GetLastUsedOptions()
-{
-    var fileContent = File.ReadAllText(FsHelpers.GetFileName("LastOption", _lastOptDir));
-
-    return fileContent;
-}
+        return Int32.Parse(fileContent);
+    }
 }
