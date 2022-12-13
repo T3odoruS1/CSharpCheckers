@@ -2,6 +2,14 @@ namespace MenuSystem;
 
 public static class ConsoleHelper
 {
+    
+    /// <summary>
+    /// Method for running a menu controlled with arrows and enter button
+    /// </summary>
+    /// <param name="canCancel">True if allow player to exit on X key press</param>
+    /// <param name="title">Title of the menu</param>
+    /// <param name="options">List of options to be displayed</param>
+    /// <returns>Option that user selected</returns>
     public static string MultipleChoice(bool canCancel, string title, params string[] options)
     {
         const int startX = 5;

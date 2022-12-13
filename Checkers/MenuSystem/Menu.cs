@@ -18,6 +18,12 @@ public class Menu
     private string _userChoice = "";
 
 
+    /// <summary>
+    /// Menu constructor
+    /// </summary>
+    /// <param name="level">Level of the menu</param>
+    /// <param name="title">Title of the menu</param>
+    /// <param name="menuItems">Items to be displayed</param>
     public Menu(EMenuLevel level, string title, List<MenuItem> menuItems)
     {
         Title = title;
@@ -40,6 +46,10 @@ public class Menu
         }
     }
 
+    /// <summary>
+    /// Run menu
+    /// </summary>
+    /// <returns>User choice</returns>
     public string RunMenu()
     {
         do
@@ -87,6 +97,11 @@ public class Menu
         return _userChoice;
     }
 
+    
+    /// <summary>
+    /// Run helper method with arrow operated UI
+    /// </summary>
+    /// <returns>User choice</returns>
     private string GetNewUserInput()
     {
         var selectedClass = ConsoleHelper.MultipleChoice(true, Title, _menuItemsAsString.ToArray());
@@ -101,11 +116,5 @@ public class Menu
         }
 
         return userChoice;
-    }
-
-    public void ExitMenu()
-    {
-        _userChoice = ShortcutExit;
-        _menuDone = true;
     }
 }

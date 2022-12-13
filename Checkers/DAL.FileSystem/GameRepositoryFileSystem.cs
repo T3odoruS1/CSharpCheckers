@@ -12,7 +12,6 @@ public class GameRepositoryFileSystem : IGameRepository
     private readonly string _gameDir = "." + 
                                         Path.DirectorySeparatorChar + "gameSaves";
     
-    // File system repo identifier
     public string Name { get; set; } = FsHelpers.FileSystemIdentifier;
     
     
@@ -45,7 +44,6 @@ public class GameRepositoryFileSystem : IGameRepository
     }
 
 
-    // Save game
     public int SavaGame(CheckerGame game)
     {
 
@@ -57,7 +55,6 @@ public class GameRepositoryFileSystem : IGameRepository
     }
 
     
-    // Update game
     public void UpdateGame(CheckerGame game)
     {
         FsHelpers.CheckOrCreateDirectory(_gameDir);
@@ -67,7 +64,6 @@ public class GameRepositoryFileSystem : IGameRepository
     
     
     
-    // Delete game by its name
     public void DeleteGameById(int id)
     {
         File.Delete(FsHelpers.GetFileName(id.ToString(), _gameDir));

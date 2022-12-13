@@ -5,7 +5,7 @@ Console.WriteLine("Hello");
 
 // TODO
 // Finish console app. Implement mandatory taking system. Print more informative messages.
-// Run game when new game is created.
+// 
 
 // Implement AI minimax algorithm
 // Integrate minimax into console and web app

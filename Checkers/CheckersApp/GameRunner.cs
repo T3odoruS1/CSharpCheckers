@@ -14,6 +14,11 @@ public class GameRunner
     private  CheckersBrain _brain = default!;
 
 
+    /// <summary>
+    /// Constructor method for game runner class
+    /// </summary>
+    /// <param name="repo">Game repository made using IGameRepository interface</param>
+    /// <param name="id">Game id</param>
     public GameRunner(IGameRepository repo, int id)
     {
         _repo = repo;
@@ -21,6 +26,11 @@ public class GameRunner
         _game = _repo.GetGameById(id);
     }
 
+    /// <summary>
+    /// Method to run the game in the console app
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if game does not have game states or options. That means that the
+    /// game was not saved properly.</exception>
     public void RunGame()
     {
         var options = _game.GameOptions;
@@ -60,6 +70,11 @@ public class GameRunner
         } while (!exit);
     }
 
+    /// <summary>
+    /// Prepare the board for the game.
+    /// </summary>
+    /// <param name="board"></param>
+    /// <returns></returns>
     private CheckerGameState GetPreparedBoard(out EGameSquareState[,] board)
     {
         CheckerGameState state;
@@ -70,11 +85,12 @@ public class GameRunner
         return state;
     }
 
+    /// <summary>
+    /// Make player preform a move
+    /// </summary>
+    /// <param name="nextMoveByBlack">True if next move is by black</param>
     private void MakeAMoveBy(bool nextMoveByBlack)
     {
-        
-
-
         int x = -1;
         int y = -1;
         
@@ -89,9 +105,7 @@ public class GameRunner
             Console.Clear();
             UI.DrawGameBoard(_brain.GetBoard(), x, y);
             Console.WriteLine("Now choose where to move this checker row");
-            
-            
-            // TODO validation
+
             var userXChoice = Console.ReadLine();
             if (!int.TryParse(userXChoice, out var destX))
             {
@@ -102,7 +116,6 @@ public class GameRunner
             Console.WriteLine("Now choose where to move this checker column");
             
             
-            // TODO validation
             var userYChoice = Console.ReadLine();
             if (!int.TryParse(userYChoice, out var destY))
             {
@@ -175,6 +188,13 @@ public class GameRunner
         } while (!destIsValid);
     }
 
+    /// <summary>
+    /// Helper method to validate user choice of the checker he wants to move
+    /// </summary>
+    /// <param name="nextMoveByBlack">True if next move by black</param>
+    /// <param name="x">x coordinate</param>
+    /// <param name="y">y coordinate</param>
+    /// <returns>x coordinate and references y coordinate</returns>
     private int PreformInitialCheckerChoice(bool nextMoveByBlack, int x, ref int y)
     {
         var choiceIsValid = false;
@@ -237,6 +257,10 @@ public class GameRunner
         return x;
     }
 
+    /// <summary>
+    /// Prints out who should make the next move
+    /// </summary>
+    /// <param name="nextMoveByBlack">True if next move by black</param>
     private void PrintNextPlayer(bool nextMoveByBlack)
     {
         switch (nextMoveByBlack)
@@ -251,6 +275,14 @@ public class GameRunner
     }
 
 
+    
+    /// <summary>
+    /// Create new game state using current x,y coordinates.
+    /// </summary>
+    /// <param name="x">x coordinate</param>
+    /// <param name="y">y coordinate</param>
+    /// <param name="pass">true if pass the move</param>
+    /// <returns>new game state</returns>
     private CheckerGameState CreateNewState(int x, int y, bool pass)
     {
         var newState = new CheckerGameState

@@ -7,6 +7,8 @@ namespace DAL.FileSystem;
 
 public class GameOptionsRepositoryFileSystem : IGameOptionRepository
 {
+    
+    // If file system repo filename and entity id are the same
     private const string FileExtension = "json";
     private readonly string _optionsDir = "." + 
                                           Path.DirectorySeparatorChar 

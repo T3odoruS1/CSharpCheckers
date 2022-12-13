@@ -1,13 +1,17 @@
 ﻿using GameBrain;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace ConsoleUI;
 
 public static class UI
 {
     
-    // Main function to draw the board
     
+    /// <summary>
+    /// Method is used to draw a game board and hilight a cell if necessary.
+    /// </summary>
+    /// <param name="board">Game board in form of 2d array with enums</param>
+    /// <param name="activeX">Optional parameter used for hilighting a cell</param>
+    /// <param name="activeY">Optional parameter used for hilighting a cell</param>
     public static void DrawGameBoard(EGameSquareState[,] board, int? activeX, int? activeY)
     {
         var width = board.GetLength(0);
@@ -65,8 +69,6 @@ public static class UI
                     case EGameSquareState.WhiteKing:
                         Console.Write("=◉=");
                         break;
-                    default:
-                        throw new ArgumentException("Invalid choice for square choice: " + board[j, i]);
                 }
                 Console.ResetColor();
 
@@ -76,36 +78,35 @@ public static class UI
         }
     }
 
-    // Get letters for columns
+    /// <summary>
+    /// String that represents an index. (Like columns in excel) 
+    /// </summary>
+    /// <param name="index">index to be transformed</param>
+    /// <returns>String that represents the index</returns>
+    
+    // ReSharper disable once UnusedMember.Local
     private static string GetCharacterForIndex(int index)
     {
         
         var columnName = "";
-
+    
         while (index > 0)
         {
             var modulo = (index- 1) % 26;
             columnName = Convert.ToChar('A' + modulo) + columnName;
             index = (index- modulo) / 26;
         }
-
+    
         return columnName;
     }
 
-    
-    // Calculate how name whitespaces to use for letter placing above the board.
-    private static string GetStringWithWhitespacesForIndex(int index)
-    {
-        var coordLetters = GetCharacterForIndex(index);
-        if (coordLetters.Length < 2 && !coordLetters.Equals("Z"))
-        {
-            return(" "+ GetCharacterForIndex(index) + " ");
-        }
-        return(" "+ GetCharacterForIndex(index) + "");
-    }
-
-    
-    // Calculating how many whitespaces to put after the row index for the board to be even.
+    /// <summary>
+    /// Return cell index as string with whitespaces. Used for bigger boards. If not used board will be ugly. Using this
+    /// the top left corner will have the biggest number
+    /// </summary>
+    /// <param name="i">index</param>
+    /// <param name="height">height of the board</param>
+    /// <returns>index as string</returns>
     private static string GetRowIndexWithWhitespacesForIndex(int i, int height)
     {
         return (height - i) switch

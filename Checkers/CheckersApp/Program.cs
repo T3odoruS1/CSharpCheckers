@@ -123,7 +123,7 @@ lastUsedRepo.NoteLastUsedOptionId(gameOptions.Id, gameRepo.Name);
 
 #endregion
 
-
+// Change game repo type
 string ChangeRepoType()
 {
      Console.Clear();
@@ -151,6 +151,8 @@ string ChangeRepoType()
      return "B";
 }
 
+
+// Delete saved game
 string DeleteSavedGame()
 {
      Console.Clear();
@@ -193,6 +195,8 @@ string DeleteSavedGame()
      }
      return "B";
 }
+
+// Load saved game
 string LoadGame()
 {
      Console.Clear();
@@ -242,7 +246,7 @@ string LoadGame()
 }
 
 
-// Make new game ond use UI method to print the board. Some test code commented out
+// Make new game and launch it
 string DoNewGame()
 {
      Console.Clear();
@@ -571,6 +575,7 @@ void WaitForUserInput()
      } while (userKey != Enter);
 }
 
+// Print out current loaded game options
 string PrintCurrentGameOptions()
 {
      Console.Clear();
@@ -580,6 +585,7 @@ string PrintCurrentGameOptions()
      return "B";
 }
 
+// Print out all saved options available
 void PrintOutAllSavedGameOptions()
 {
      Console.Clear();
@@ -593,7 +599,7 @@ void PrintOutAllSavedGameOptions()
      }
 }
 
-
+// Very important!!! There isn't a single part of this app that works without this.
 string EasterEggMethod()
 {
 

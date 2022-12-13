@@ -9,7 +9,16 @@ namespace CheckersApp;
 
 public class DalTester
 {
-    
+    /// <summary>
+    /// Method for testing Data Access Layer functionality before the launch of console app. Runs tests on
+    /// database and filesystem access layers to verify their functionality before using the app. If something is wrong
+    /// en exception will be thrown. Domain classes need to have Equals method implemented.
+    /// </summary>
+    /// <param name="gameRepoFs">File system game repository</param>
+    /// <param name="gameRepoDb">Database game repository</param>
+    /// <param name="optionRepoFs">File system option repository</param>
+    /// <param name="optionRepoDb">Database option repository</param>
+    /// <exception cref="Exception">Thrown if some aspect of DAL is not functional</exception>
     public void TestDalFunctionality(
         GameRepositoryFileSystem gameRepoFs, 
         GameRepositoryDatabase gameRepoDb, 
