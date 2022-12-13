@@ -10,6 +10,7 @@ using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 using static System.ConsoleKey;
 
+
 var gameOptions = new CheckerGameOptions
 {
      Name = "Default"
@@ -93,7 +94,22 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 try
 {
-     gameOptions = optionRepo.GetOptionsById(lastUsedRepo.GetLastUsedOptionsId());
+     
+     // Use last used options and data access system
+     var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
+     if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
+     {
+          optionRepo = optionRepoFs;
+          gameRepo = gameRepoFs;
+     }
+     else
+     {
+          optionRepo = optionsRepoDb;
+          gameRepo = gameRepoDb;
+     }
+     gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
+
+
 
 }
 catch (Exception)
@@ -103,7 +119,7 @@ catch (Exception)
 
 mainMenu.RunMenu();
 
-lastUsedRepo.NoteLastUsedOptionId(gameOptions.Id);
+lastUsedRepo.NoteLastUsedOptionId(gameOptions.Id, gameRepo.Name);
 
 #endregion
 
@@ -392,17 +408,7 @@ string SaveCurrentOptions()
      Console.WriteLine("Current game option:");
      Console.WriteLine(gameOptions);
      Console.CursorVisible = true;
-     Console.WriteLine("How would you like to name this game option? You should choose a name that is not already used.");
-     Console.WriteLine("Hint: Taken names:\n\n");
-     if (optionRepo.GetGameOptionsList().Count != 0)
-     {
-          foreach (var opt in optionRepo.GetGameOptionsList())
-          {
-
-               Console.WriteLine(opt);
-
-          }
-     }
+     Console.WriteLine("How would you like to name this game option?");
 
      string userInputForFileName;
      do
@@ -456,29 +462,29 @@ string RunSubmenu()
      
      var menuItems = new List<MenuItem>();
      var listOfOptions = new List<CheckerGameOptions>();
-     
+     var i = 0;
      // For each option choice shortcut is a number in string form, other shortcuts are standard
      foreach (var gameOption in optionRepo.GetGameOptionsList())
      {
-          menuItems.Add(new MenuItem(gameOption.Id.ToString(), 
+          menuItems.Add(new MenuItem(i.ToString(), 
                gameOption.Name + ":" + 
                $"Height: {gameOption.Height}," +
                $" Width: {gameOption.Width}," +
                $" White starts: {gameOption.WhiteStarts}," +
                $" Taking mandatory: {gameOption.TakingIsMandatory}," +
-               $" Amount of games: {gameOption.GameCount}", 
+               $" Id: {gameOption.Id}", 
                null));
           listOfOptions.Add(gameOption);
+          i++;
      }
      var loadMenu = new Menu(EMenuLevel.Other,
           ">  NB! You can delete only those games, that are not used in any games.  <", menuItems);
      
      var userChoice = loadMenu.RunMenu();
-
      
      // If user choice is number then return user choice return one of the options that he has chose.
      // Else return  user choice
-     return !int.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j].Id.ToString();
+     return !Int32.TryParse(userChoice, out var j) ? userChoice : listOfOptions[j].Id.ToString();
 }
 
 

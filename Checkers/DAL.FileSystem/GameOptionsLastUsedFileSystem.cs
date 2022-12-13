@@ -10,17 +10,19 @@ public class GameOptionsLastUsedFileSystem : IGameOptionLastSave
 
     public string Name { get; set; } = FsHelpers.FileSystemIdentifier;
 
-    public void NoteLastUsedOptionId(int id)
+    public void NoteLastUsedOptionId(int id, string dalMethod)
     {
         FsHelpers.CheckOrCreateDirectory(_lastOptDir);
-        File.WriteAllText(FsHelpers.GetFileName("LastOption", _lastOptDir), id.ToString());
+        var data = id + ";" + dalMethod;
+        File.WriteAllText(FsHelpers.GetFileName("LastOption", _lastOptDir), data);
     }
 
 
-    public int GetLastUsedOptionsId()
+    public (int optId, string dalMethod) GetLastUsedOptionsId()
     {
         var fileContent = File.ReadAllText(FsHelpers.GetFileName("LastOption", _lastOptDir));
-
-        return Int32.Parse(fileContent);
+        Console.WriteLine(fileContent);
+        var data = fileContent.Split(";");
+        return (Int32.Parse(data[0]), data[1]);
     }
 }

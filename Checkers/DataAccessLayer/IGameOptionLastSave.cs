@@ -5,7 +5,7 @@ public interface IGameOptionLastSave
 {
     public string Name { get; set; }
 
-    public void NoteLastUsedOptionId(int id);
+    public void NoteLastUsedOptionId(int id, string dalMethod);
 
-    public int GetLastUsedOptionsId();
+    public (int optId, string dalMethod) GetLastUsedOptionsId();
 }

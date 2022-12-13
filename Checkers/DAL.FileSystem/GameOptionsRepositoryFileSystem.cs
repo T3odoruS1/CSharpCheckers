@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Xml;
 using DataAccessLayer;
 using Domain;
 
@@ -25,7 +26,13 @@ public class GameOptionsRepositoryFileSystem : IGameOptionRepository
         foreach (var fileName in Directory.GetFileSystemEntries(
                      _optionsDir, "*" + FileExtension))
         {
-            res.Add(GetOptionsById(Int32.Parse(fileName)));
+            Console.WriteLine("Filename without extension");
+            Console.WriteLine(Path.GetFileNameWithoutExtension(fileName));
+            
+            res.Add(GetOptionsById(
+                Convert.ToInt32(
+                    Path.GetFileNameWithoutExtension(
+                        fileName))));
         }
 
         return res;
