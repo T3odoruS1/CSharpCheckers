@@ -25,6 +25,8 @@ public class RobotBrawl : PageModel
     public EGameSquareState[,] Board { get; set; } = default!;
     public CheckerGameState GameState { get; set; } = default!;
     public CheckerGame Game { get; set; } = default!;
+
+    public bool gameOver = false;
     
     
     public IActionResult OnGet(int? id)
@@ -49,15 +51,21 @@ public class RobotBrawl : PageModel
         var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
         Board = FsHelpers.JaggedTo2D(jagged!);
         Brain.SetGameBoard(Board, GameState);
-        
-        
- 
-        var move = Brain.MakeMoveByAi(Brain.NextMoveByBlack());
-        UpdateRepo(move.x, move.y);
-        return Page();
-        
 
-        
+
+        if (!Brain.IsGameOver())
+        {
+            var move = Brain.MakeMoveByAi(Brain.NextMoveByBlack());
+            UpdateRepo(move.x, move.y);
+            return Page();
+        }
+
+        gameOver = true;
+        return Page();
+
+
+
+
     }
     
     private void UpdateRepo(int x, int y)

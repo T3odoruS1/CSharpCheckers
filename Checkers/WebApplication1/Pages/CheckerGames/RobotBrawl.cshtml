@@ -10,12 +10,10 @@
     @if (Model.WonByBlack == null)
     {
 
+
         <h2>
-            Current droid: @GetDroidName()
-        </h2>
-        <h2>
-            Next move: @(!Model.Brain.NextMoveByBlack() ? $"Player One - {Model.Game.Player1Name} - White" :
-                           $"Player Two - {Model.Game.Player2Name} - Black")
+            Next move: @(!Model.Brain.NextMoveByBlack() ? $"Droid One - {Model.Game.Player1Name} - White" :
+                           $"Droid Two - {Model.Game.Player2Name} - Black")
         </h2>
     }
     else
@@ -75,7 +73,7 @@
 
     string GetDroidName()
     {
-        return "";
+        return Model.Brain.NextMoveByBlack() ? Model.Game!.Player2Name : Model.Game.Player1Name;
     }
 }
 
@@ -84,7 +82,9 @@
     
 @section Scripts 
 {
-   <script>
+    @if (!Model.Brain.IsGameOver())
+    {
+        <script>
             setTimeout(()=>{
                 window.location = '/CheckerGames/RobotBrawl?id=@Model.Game.Id';
             },7000)
@@ -92,6 +92,8 @@
 
 
     </script>
+    }
+   
     
 
 }

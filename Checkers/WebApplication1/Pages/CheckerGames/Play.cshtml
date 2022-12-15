@@ -72,18 +72,30 @@
                         if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y) ||
                             (x == Model.InitX &&
                              y == Model.InitY &&
-                             !(Model.GameState.CheckerThatPreformedTakingX != null &&
-                               Model.Game.GameOptions!.TakingIsMandatory)))
+                             Model.GameState.CheckerThatPreformedTakingX == null))
                         {
-                            <div class="clickable-div highlighted-div active-checker-div" onclick="window.
+                            if (Model.InitX != x && Model.InitY != y)
+                            {
+                                <div class="clickable-div highlighted-div active-checker-div" onclick="window.
                             location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY&playerNo=@Model.PlayerNo'">
 
-                                @GetCellContents(Model.Board[x, y])
-                            </div>
+                                    @GetCellContents(Model.Board[x, y])
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="clickable-div @(x == Model.InitX &&
+                                                            y == Model.InitY &&
+                                                            Model.GameState.CheckerThatPreformedTakingX == null? "active-checker-div" : "")">
+                                    @GetCellContents(Model.Board[x, y])
+                                </div>
+                            }
+                            
                         }
                         else
                         {
-                            <div class="clickable-div @(x == Model.InitX && y == Model.InitY ? "active-checker-div" : "")">
+                            <div class="clickable-div @(x == Model.InitX &&
+                                                        y == Model.InitY ? "active-checker-div" : "")">
                                 @GetCellContents(Model.Board[x, y])
                             </div>
                         }
