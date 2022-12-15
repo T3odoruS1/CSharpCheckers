@@ -58,14 +58,15 @@
                 @Html.DisplayFor(modelItem => item.GameWonBy)
             </td>
             <td>
-                Play as:
                 @if (item.Player1Type != EPlayerType.Ai)
                 {
+                    <text>Play as:</text>
                     <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="0">@Html.DisplayFor(modelItem => item.Player1Name)</a>
 
                 }
                 else
                 {
+                    <text>Robot:</text>
                     @Html.DisplayFor(modelItem => item.Player1Name)
 
                 }
@@ -75,14 +76,17 @@
                 @Html.DisplayFor(modelItem => item.Player1Type)
             </td>
             <td>
-                Play as:
                 @if (item.Player2Type != EPlayerType.Ai)
                 {
+                    <text>Play as:</text>
+
                     <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="1">@Html.DisplayFor(modelItem => item.Player2Name)</a>
 
                 }
                 else
                 {
+                    <text>Robot:</text>
+
                     @Html.DisplayFor(modelItem => item.Player2Name)
 
                 }

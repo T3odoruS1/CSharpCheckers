@@ -44,7 +44,11 @@
                 @Html.DisplayFor(modelItem => item.CheckerGame!.Name)
             </td>
             <td>
-                @if (item.CheckerGame!.CheckerGameStates!.Count > 1)
+                @if (item.CheckerGame!.CheckerGameStates!.Count > 1 
+                     // If allow to delete only last states
+                     // && item.Equals(item.CheckerGame!.CheckerGameStates!.Last())
+                    
+                    )
                 {
                     <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
 
