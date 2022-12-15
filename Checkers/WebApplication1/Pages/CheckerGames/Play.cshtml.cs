@@ -83,7 +83,20 @@ public class Play : PageModel
         Board = FsHelpers.JaggedTo2D(jagged!);
         Brain.SetGameBoard(Board, GameState);
         Brain.TestIfGameOver();
-
+        var movables = Brain.GetAllMoves(Brain.NextMoveByBlack());
+        if (movables.Count == 0)
+        {
+            Brain.ToggleNextMove();
+            var newState = new CheckerGameState
+            {
+                SerializedGameBoard = JsonSerializer.Serialize(
+                    FsHelpers.ToJaggedArray(Brain.GetBoard())),
+                NextMoveByBlack = Brain.NextMoveByBlack()
+            };
+            Game.CheckerGameStates.Add(newState);
+            Repo.UpdateGame(Game);
+            
+        }
         
         #endregion
 

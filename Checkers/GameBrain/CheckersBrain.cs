@@ -1007,16 +1007,6 @@ public class CheckersBrain
         return moves;
     }
 
-
-    /// <summary>
-    /// Get next player color using enums with black and white
-    /// </summary>
-    /// <returns></returns>
-    private EPlayerSide GetNextPlayer()
-    {
-        return _nextMoveByBlack ? EPlayerSide.Black : EPlayerSide.White;
-    }
-
     /// <summary>
     /// Evaluate board.
     /// </summary>
