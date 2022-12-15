@@ -651,9 +651,9 @@ public class CheckersBrain
 
         if (_gameBoard[x, y] == EGameSquareState.BlackKing || _gameBoard[x, y] == EGameSquareState.WhiteKing)
         {
-            for (int yi = 0; yi < _checkerGameOptions.Width; yi++)
+            for (int yi = 0; yi < _checkerGameOptions.Height; yi++)
             {
-                for (int xi = 0; xi < _checkerGameOptions.Height; xi++)
+                for (int xi = 0; xi < _checkerGameOptions.Width; xi++)
                 {
                     // Check if diagonal and difference if bigger than 1
                     if (Math.Abs(x - xi) == Math.Abs(y - yi) &&
