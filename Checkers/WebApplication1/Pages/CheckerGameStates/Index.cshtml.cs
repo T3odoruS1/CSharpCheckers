@@ -25,6 +25,7 @@ namespace WebApplication1.Pages.CheckerGameStates
         public SelectList GameSelectList { get; set; } = default!;
 
         public IList<CheckerGameState> CheckerGameState { get; set; } = default!;
+        
 
         // Id - optional for state filtering.
         public async Task OnGetAsync()

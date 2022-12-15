@@ -9,9 +9,6 @@
 <h3 class="checker-counter"> Black: @Model.Brain.CountCheckers(true)</h3>
 <br/>
 
-@(Model.Brain.CountEnemyAdjCheckers(4,3, 2, 5, false))
-@(Model.Brain.CountEnemyAdjCheckers(4,3, 6, 1, false))
-
 
 <h2>
     @if (Model.WonByBlack == null)
@@ -45,8 +42,11 @@
             {
                 <td class="game-table-cell @GetCellBgrClass(Model.Board[x, y], x, y)">
 
-                    @if (!Model.FirstReq && Model.Board[x, y] != EGameSquareState.Unplayable &&
-                         Model.Board[x, y] != EGameSquareState.Empty && Model.Brain.HasMoves(x, y))
+                    @if (!Model.FirstReq && 
+                         Model.Board[x, y] != EGameSquareState.Unplayable &&
+                         Model.Board[x, y] != EGameSquareState.Empty && 
+                         Model.Brain.HasMoves(x, y) && 
+                         CheckerIsClickable(x,y))
                     {
                         if (Model.IsPlayerMove())
                         {
@@ -62,11 +62,16 @@
                             </div>
                         }
                     }
-                    else if (Model.FirstReq && Model.InitX != null && Model.InitY != null && Model.IsPlayerMove())
+                    else if (Model.FirstReq && 
+                             Model.InitX != null && 
+                             Model.InitY != null && 
+                             Model.IsPlayerMove())
                     {
                         if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y) ||
-                            (x == Model.InitX && y == Model.InitY && !(Model.GameState.CheckerThatPreformedTakingX != null &&
-                                                                       Model.Game.GameOptions!.TakingIsMandatory)))
+                            (x == Model.InitX &&
+                             y == Model.InitY &&
+                             !(Model.GameState.CheckerThatPreformedTakingX != null &&
+                               Model.Game.GameOptions!.TakingIsMandatory)))
                         {
                             <div class="clickable-div highlighted-div active-checker-div" onclick="window.
                             location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY&playerNo=@Model.PlayerNo'">
@@ -111,7 +116,7 @@
         <script>
             setTimeout(()=>{
                 window.location = '/CheckerGames/Play?id=@Model.Game.Id&playerNo=@Model.PlayerNo';
-            },@Model.AiInTheGame() ? 5000 : 1000)
+            },1000)
 
 
 
@@ -153,6 +158,26 @@
                 return "=◎=";
         }
         return "";
+    }
+
+    bool CheckerIsClickable(int x, int y)
+    {
+        if (Model.IsPlayerMove())
+        {
+            if (Model.PlayerNo == 0 &&
+                (Model.Board[x, y] == EGameSquareState.White ||
+                 Model.Board[x, y] == EGameSquareState.WhiteKing))
+            {
+                return true;
+            }
+            if (Model.PlayerNo == 1 &&
+                (Model.Board[x, y] == EGameSquareState.BlackKing ||
+                 Model.Board[x, y] == EGameSquareState.Black))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     string GetCurrentPlayerName()

@@ -39,7 +39,7 @@ namespace WebApplication1.Pages.CheckerGames
             {
                 return Page();
             }
-
+            
             var optId = CheckerGame.OptionsId;
             var options = _context.CheckerGameOptions.First(o => o.Id == optId);
 

@@ -44,7 +44,11 @@
                 @Html.DisplayFor(modelItem => item.CheckerGame!.Name)
             </td>
             <td>
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                @if (item.CheckerGame!.CheckerGameStates!.Count > 1)
+                {
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+
+                }
             </td>
         </tr>
     }

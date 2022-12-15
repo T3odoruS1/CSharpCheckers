@@ -750,7 +750,7 @@ public class CheckersBrain
             }
             else
             {
-                if (destY == _gameBoard.GetLength(0) - 1)
+                if (destY == _gameBoard.GetLength(1) - 1)
                 {
                     _gameBoard[destX, destY] = EGameSquareState.WhiteKing;
                     if (CanTake(destX, destY) && _nextMoveByBlack && _takingDone)
