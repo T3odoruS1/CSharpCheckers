@@ -53,7 +53,7 @@ td{
 }
 
 .game-table-cell-black {
-  background-color: black !important;
+  background-color: darkslategrey !important;
 }
 
 .game-table-cell-move-is-possible {

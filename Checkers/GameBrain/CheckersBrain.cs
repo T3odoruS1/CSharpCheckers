@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Runtime.InteropServices;
+using Domain;
 
 namespace GameBrain;
 
@@ -6,12 +7,13 @@ public class CheckersBrain
 {
     private EGameSquareState[,] _gameBoard;
 
-    private readonly CheckerGameOptions _checkerGameOptions;
+    private CheckerGameOptions _checkerGameOptions;
     private bool _gameOver;
     private bool _nextMoveByBlack;
     private bool _takingDone;
     private bool _canDoAnotherTake;
     private bool _gameWonByBlack;
+    private (int x, int y)? _coordsOfTakingChecker;
 
     public CheckersBrain(CheckerGameOptions options)
     {
@@ -96,6 +98,7 @@ public class CheckersBrain
             }
         }
     }
+
     /// <summary>
     /// Method to make a copy of the board currently used by the brain. This is a clone, not a reference.
     /// </summary>
@@ -112,6 +115,68 @@ public class CheckersBrain
         }
 
         return res;
+    }
+
+
+    /// <summary>
+    /// Get a deepcopy of this game brain
+    /// </summary>
+    /// <returns></returns>
+    public CheckersBrain CloneBrain()
+    {
+        var boardCopy = GetBoard();
+        var gameOver = _gameOver;
+        var nextMoveByBlack = _nextMoveByBlack;
+        var takingDone = _takingDone;
+        var canDoAnotherTake = _canDoAnotherTake;
+        var gameWonByBlack = _gameWonByBlack;
+        var coordsOfTakingChecker = _coordsOfTakingChecker;
+
+        var newBrain = new CheckersBrain(_checkerGameOptions);
+        newBrain.SetNewParameters(
+            boardCopy,
+            _checkerGameOptions,
+            gameOver,
+            nextMoveByBlack,
+            takingDone,
+            canDoAnotherTake,
+            gameWonByBlack,
+            coordsOfTakingChecker);
+
+        return newBrain;
+    }
+
+
+    
+    /// <summary>
+    /// Set all parameters for brain copy.
+    /// </summary>
+    /// <param name="board"></param>
+    /// <param name="options"></param>
+    /// <param name="gameOver"></param>
+    /// <param name="nextMoveByBlack"></param>
+    /// <param name="takingDone"></param>
+    /// <param name="canDoAnotherTake"></param>
+    /// <param name="gameWonByBlack"></param>
+    /// <param name="coordsOfTakingChecker"></param>
+    private void SetNewParameters(
+        EGameSquareState[,] board,
+        CheckerGameOptions options,
+        bool gameOver,
+        bool nextMoveByBlack,
+        bool takingDone,
+        bool canDoAnotherTake,
+        bool gameWonByBlack,
+        (int x, int y)? coordsOfTakingChecker)
+    {
+        _gameBoard = board;
+        _checkerGameOptions = options;
+        _gameOver = gameOver;
+        _nextMoveByBlack = nextMoveByBlack;
+        _takingDone = takingDone;
+        _canDoAnotherTake = canDoAnotherTake;
+        _gameWonByBlack = gameWonByBlack;
+        _coordsOfTakingChecker = coordsOfTakingChecker;
     }
 
     /// <summary>
@@ -131,8 +196,13 @@ public class CheckersBrain
         }
 
         _nextMoveByBlack = state.NextMoveByBlack;
-    }
+        if (state.CheckerThatPreformedTakingX != null && state.CheckerThatPreformedTakingY != null)
+        {
+            _coordsOfTakingChecker = (state.CheckerThatPreformedTakingX.Value,
+                state.CheckerThatPreformedTakingY.Value);
+        }
 
+    }
 
 
     /// <summary>
@@ -143,9 +213,11 @@ public class CheckersBrain
     /// <param name="iniY">Initial y of the checker</param>
     /// <param name="destX">Destination x of the checker</param>
     /// <param name="destY">Destination y of the checker</param>
+    /// <param name="board">Optional parameter. If you need to evaluate external board input it here.</param>
     /// <returns>True if move is possible and false if not possible</returns>
-    public bool MoveIsPossible(int iniX, int iniY, int destX, int destY)
+    public bool MoveIsPossible(int iniX, int iniY, int destX, int destY, EGameSquareState[,]? board = null)
     {
+        
         // Check if coordinates are in range of game board.
         if (iniX > _checkerGameOptions.Height || iniX < 0 ||
             destX > _checkerGameOptions.Height || destX < 0 ||
@@ -153,6 +225,21 @@ public class CheckersBrain
             destY > _checkerGameOptions.Width || destY < 0)
         {
             return false;
+        }
+
+        if (_canDoAnotherTake)
+        {
+            if (_coordsOfTakingChecker != null)
+            {
+                if ((!CanTake(_coordsOfTakingChecker.Value.x, _coordsOfTakingChecker.Value.y) ||
+                     _coordsOfTakingChecker.Value.x != iniX || _coordsOfTakingChecker.Value.y != iniY) &&
+                    !MoveIsTaking(iniX, iniY, destX, destY))
+                {
+                    return false;
+
+                }
+            }
+           
         }
 
         // If game square is not empty return false
@@ -343,6 +430,20 @@ public class CheckersBrain
         return _gameWonByBlack;
     }
 
+    private bool MoveIsTaking(int x, int y, int destX, int destY)
+    {
+        if (x > _checkerGameOptions.Height || x < 0 ||
+            destX > _checkerGameOptions.Height || destX < 0 ||
+            y > _checkerGameOptions.Width || y < 0 ||
+            destY > _checkerGameOptions.Width || destY < 0)
+        {
+            return false;
+        }
+        var data = CountEnemyAdjCheckers(x, y, destX, destY, false);
+        return data.Item1 == 1 && data.Item2 == 0 && _gameBoard[destX, destY] == EGameSquareState.Empty;
+    }
+
+
     /// <summary>
     /// This is a multipurpose method. In the first case when getCoords parameter is false, this method returns a tuple,
     /// where first int is amount of enemies on the diagonal between initial coordinates and destination coordinates and second is
@@ -356,14 +457,21 @@ public class CheckersBrain
     /// <param name="getCoords">Function mode. True if count enemy and friendly checkers on diagonal and false if
     /// get coords of enemy checker on this diagonal.</param>
     /// <returns>Return type depends on the function mode</returns>
-    private Tuple<int, int> CountEnemyAdjCheckers(int iniX, int iniY, int destX, int destY, bool getCoords)
+    public Tuple<int, int> CountEnemyAdjCheckers(int iniX, int iniY, int destX, int destY, bool getCoords)
     {
         // Return tuple where first number is amount of enemy checkers on this trajectory and second number 
         // amount of friendly checkers on this trajectory
+        if (Math.Abs(iniX - destX) != Math.Abs(iniY - destY))
+        {
+            return new Tuple<int, int>(0, 0);
+        }
+        
         var biggerX = iniX > destX ? iniX : destX;
         var biggerY = iniY > destY ? iniY : destY;
+        
         var smallerX = iniX < destX ? iniX : destX;
         var smallerY = iniY < destY ? iniY : destY;
+        
         var xGrowing = destX > iniX;
         var yGrowing = destY > iniY;
 
@@ -377,10 +485,10 @@ public class CheckersBrain
         {
             var x = xGrowing ? smallerX : biggerX;
             var y = yGrowing ? smallerY : biggerY;
-
             switch (_gameBoard[iniX, iniY])
             {
-                case EGameSquareState.WhiteKing:
+                    
+                case EGameSquareState.WhiteKing: case EGameSquareState.White:
                     if (_gameBoard[x, y] == EGameSquareState.Black ||
                         _gameBoard[x, y] == EGameSquareState.BlackKing)
                     {
@@ -392,14 +500,14 @@ public class CheckersBrain
                         enemyCount++;
                     }
 
-                    if (_gameBoard[x, y] == EGameSquareState.White ||
-                        _gameBoard[x, y] == EGameSquareState.WhiteKing && x != iniX && y != iniY)
+                    if ((_gameBoard[x, y] == EGameSquareState.White ||
+                         _gameBoard[x, y] == EGameSquareState.WhiteKing) && x != iniX && y != iniY)
                     {
                         friendlyCount++;
                     }
 
                     break;
-                case EGameSquareState.BlackKing:
+                case EGameSquareState.BlackKing: case EGameSquareState.Black:
                     if (_gameBoard[x, y] == EGameSquareState.White ||
                         _gameBoard[x, y] == EGameSquareState.WhiteKing)
                     {
@@ -411,8 +519,8 @@ public class CheckersBrain
                         enemyCount++;
                     }
 
-                    if (_gameBoard[x, y] == EGameSquareState.Black ||
-                        _gameBoard[x, y] == EGameSquareState.BlackKing && x != iniX && y != iniY)
+                    if ((_gameBoard[x, y] == EGameSquareState.Black ||
+                         _gameBoard[x, y] == EGameSquareState.BlackKing) && x != iniX && y != iniY)
                     {
                         friendlyCount++;
                     }
@@ -473,7 +581,12 @@ public class CheckersBrain
         return false;
     }
 
-    
+    private (int x, int y)? GetCoordsOfTakingChecker()
+    {
+        return _coordsOfTakingChecker;
+    }
+
+
     /// <summary>
     /// Check if checker has any taking opportunities
     /// </summary>
@@ -486,7 +599,7 @@ public class CheckersBrain
         {
             try
             {
-                if (MoveIsPossible(x, y, x - 2, y - 2))
+                if (MoveIsTaking(x, y, x - 2, y - 2))
                 {
                     return true;
                 }
@@ -494,21 +607,21 @@ public class CheckersBrain
 
                 try
                 {
-                    if (MoveIsPossible(x, y, x + 2, y - 2))
+                    if (MoveIsTaking(x, y, x + 2, y - 2))
                     {
                         return true;
                     }
 
                     try
                     {
-                        if (MoveIsPossible(x, y, x + 2, y + 2))
+                        if (MoveIsTaking(x, y, x + 2, y + 2))
                         {
                             return true;
                         }
 
                         try
                         {
-                            if (MoveIsPossible(x, y, x - 2, y + 2))
+                            if (MoveIsTaking(x, y, x - 2, y + 2))
                             {
                                 return true;
                             }
@@ -520,6 +633,7 @@ public class CheckersBrain
                     }
                     catch (IndexOutOfRangeException)
                     {
+                        return false;
                     }
                 }
 
@@ -531,6 +645,7 @@ public class CheckersBrain
             }
             catch (IndexOutOfRangeException)
             {
+                return false;
             }
         }
 
@@ -597,10 +712,12 @@ public class CheckersBrain
                 {
                     _nextMoveByBlack = !_nextMoveByBlack;
                     _canDoAnotherTake = false;
+                    _coordsOfTakingChecker = null;
                 }
                 else
                 {
                     _canDoAnotherTake = true;
+                    _coordsOfTakingChecker = (destX, destY);
                 }
             }
             else
@@ -609,6 +726,7 @@ public class CheckersBrain
                 _gameBoard[iniX, iniY] = EGameSquareState.Empty;
                 _nextMoveByBlack = !_nextMoveByBlack;
                 _canDoAnotherTake = false;
+                _coordsOfTakingChecker = null;
                 _takingDone = false;
             }
 
@@ -623,6 +741,8 @@ public class CheckersBrain
                     {
                         _nextMoveByBlack = true;
                         _canDoAnotherTake = true;
+                        _coordsOfTakingChecker = (destX, destY);
+
                     }
 
                     return;
@@ -637,6 +757,8 @@ public class CheckersBrain
                     {
                         _nextMoveByBlack = false;
                         _canDoAnotherTake = true;
+                        _coordsOfTakingChecker = (destX, destY);
+
                     }
 
                     return;
@@ -683,7 +805,7 @@ public class CheckersBrain
     }
 
 
-    
+
     /// <summary>
     /// Method to check if next move is by black
     /// </summary>
@@ -707,7 +829,7 @@ public class CheckersBrain
         return (a + b) / 2;
     }
 
-    
+
     /// <summary>
     /// Method to toggle next move of the player
     /// </summary>
@@ -716,7 +838,7 @@ public class CheckersBrain
         _nextMoveByBlack = !_nextMoveByBlack;
     }
 
-    
+
     /// <summary>
     /// Method count the checkers on the board. If parameter if true counts black ones if false white ones.
     /// </summary>
@@ -746,20 +868,41 @@ public class CheckersBrain
     }
 
 
-
-
-    public void MakeMoveByAi()
+    private (int x, int y, int destX, int destY) GenerateARandomMove(bool isBlack)
     {
-        throw new NotImplementedException();
+        if (!_nextMoveByBlack && isBlack)
+        {
+            throw new ArgumentException("Ai tried to make a move for black player but it's not it's turn");
+        }
+
+        var movableCheckers = GetAllMovableCheckersFor(isBlack);
+        var allMoves = new List<(int x, int y, int destX, int destY)>();
+        foreach (var coord in movableCheckers)
+        {
+            var move = GetMovesFor(coord.x, coord.y);
+            foreach (var possibleMove in move)
+            {
+                allMoves.Add((possibleMove.x, possibleMove.y, possibleMove.destX, possibleMove.destY));
+            }
+        }
+
+        var rnd = new Random();
+
+        var i = rnd.Next(allMoves.Count);
+        return allMoves[i];
     }
-
-
-    public List<(int x, int y)> GetAllMovableCheckersFor(bool isBlack)
+    
+    /// <summary>
+    /// Get all possible moves for player
+    /// </summary>
+    /// <param name="isBlack">Ture if player is black</param>
+    /// <returns>List of tuples with every possible move coords.</returns>
+    private List<(int x, int y)> GetAllMovableCheckersFor(bool isBlack)
     {
         List<(int x, int y)> ret = new();
-        for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
+        for (var yi = 0; yi < _gameBoard.GetLength(1); yi++)
         {
-            for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
+            for (var xi = 0; xi < _gameBoard.GetLength(0); xi++)
             {
                 if (isBlack &&
                     (_gameBoard[xi, yi] == EGameSquareState.Black ||
@@ -768,6 +911,13 @@ public class CheckersBrain
                 {
                     ret.Add((xi, yi));
                 }
+                else if (!isBlack &&
+                         (_gameBoard[xi, yi] == EGameSquareState.White ||
+                          _gameBoard[xi, yi] == EGameSquareState.WhiteKing) &&
+                         HasMoves(xi, yi))
+                {
+                    ret.Add((xi, yi));
+                }
 
             }
         }
@@ -775,16 +925,16 @@ public class CheckersBrain
         return ret;
     }
 
-    private List<(int x, int y)> GetMovesFor(int x, int y)
+    private List<(int x, int y, int destX, int destY)> GetMovesFor(int x, int y)
     {
-        List<(int x, int y)> ret = new List<(int x, int y)>();
+        var ret = new List<(int x, int y, int destX, int destY)>();
         for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
         {
             for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
             {
                 if (MoveIsPossible(x, y, xi, yi))
                 {
-                    ret.Add((xi, yi));
+                    ret.Add((x, y, xi, yi));
                 }
             }
         }
@@ -792,5 +942,140 @@ public class CheckersBrain
         return ret;
     }
 
+    
 
+
+    public (int x, int y) MakeMoveByAi(bool isBlack)
+    {
+        // Randomly chosen move
+        var rndMove = PreformMiniMaxDecision(isBlack);
+
+
+        MoveChecker(rndMove.x, rndMove.y, rndMove.destX, rndMove.destY);
+
+        // If taking was preformed ---> preform another take.
+        Console.WriteLine("Ai prefomed a move");
+        return (rndMove.destX, rndMove.destY);
+    }
+
+
+
+    private Move PreformMiniMaxDecision(bool isBlack)
+    {
+        var brainClone = CloneBrain();
+
+        var depth = 4;
+
+        var desicion = MM.Minimax(depth, brainClone, !isBlack);
+        Console.WriteLine(desicion.move);
+        Console.WriteLine(desicion.evaluation);
+
+
+        // What I need?
+
+        // Termianl state                    - IsGameOver()           - done
+        // Utility                           - EvaluateBoard()        - to be implemented.
+        // Extract move from suggested board - ExtractMoveFromBoard() - to be implemented.
+        // Get next board state              - GetNextBoardState()    - to be implemented.
+        // Get next player                   - GetNextPlayer()        - done ?
+        return desicion.move;
+    }
+
+
+    public List<Move> GetAllMoves(bool isBlack)
+    {
+        var moves = new List<Move>();
+        var checkers = GetAllMovableCheckersFor(isBlack);
+
+        foreach (var coords in checkers)
+        {
+            var posibilities = GetMovesFor(coords.x, coords.y);
+            foreach (var posibility in posibilities)
+            {
+                var move = new Move()
+                {
+                    x = posibility.x,
+                    y = posibility.y,
+                    destX = posibility.destX,
+                    destY = posibility.destY
+                };
+                if (MoveIsPossible(move.x, move.y, move.destX, move.destY))
+                {
+                    moves.Add(move);
+
+                }
+            }
+        }
+
+        return moves;
+    }
+
+
+    /// <summary>
+    /// Get next player color using enums with black and white
+    /// </summary>
+    /// <returns></returns>
+    private EPlayerSide GetNextPlayer()
+    {
+        return _nextMoveByBlack ? EPlayerSide.Black : EPlayerSide.White;
+    }
+
+    /// <summary>
+    /// Evaluate board.
+    /// </summary>
+    /// <param name="board"></param>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public double EvaluateBoard(EGameSquareState[,] board)
+    {
+        var white = CountCheckersWithKings(false, board);
+        var black = CountCheckersWithKings(true, board);
+        return white.r - black.r + white.k * 2 - black.k * 2;
+    }
+
+
+    /// <summary>
+    /// Count the checkers for a specific side
+    /// </summary>
+    /// <param name="isBlack">True if black checkers</param>
+    /// <param name="board">Game board</param>
+    /// <returns>Tuple, where r is for regular checkers and k is for kings</returns>
+    private (int r, int k) CountCheckersWithKings(bool isBlack, EGameSquareState[,] board)
+    {
+        var regular = 0;
+        var kings = 0;
+        
+        for (int yi = 0; yi < board.GetLength(1); yi++)
+        {
+            for (int xi = 0; xi < board.GetLength(0); xi++)
+            {
+                if (isBlack)
+                {
+                    switch (board[xi, yi])
+                    {
+                        case EGameSquareState.Black:
+                            regular++;
+                            break;
+                        case EGameSquareState.BlackKing:
+                            kings++;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (board[xi, yi])
+                    {
+                        case EGameSquareState.White:
+                            regular++;
+                            break;
+                        case EGameSquareState.WhiteKing:
+                            kings++;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return (regular, kings);
+    }
 }

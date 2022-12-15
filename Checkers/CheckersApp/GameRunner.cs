@@ -52,7 +52,25 @@ public class GameRunner
 
             if (_game.GameWonBy == null)
             {
-                MakeAMoveBy(state.NextMoveByBlack);    
+                if (state.NextMoveByBlack && _game.Player2Type == EPlayerType.Ai)
+                {
+                    _brain.MakeMoveByAi(state.NextMoveByBlack);
+                    var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
+                    var nState = CreateNewState(coords.x, coords.y, false);
+                    _game.CheckerGameStates.Add(nState);
+                    _repo.UpdateGame(_game);
+                }
+                else if (!state.NextMoveByBlack && _game.Player1Type == EPlayerType.Ai)
+                {
+                    var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
+                    var nState = CreateNewState(coords.x, coords.y, false);
+                    _game.CheckerGameStates.Add(nState);
+                    _repo.UpdateGame(_game);
+                }
+                else
+                {
+                    MakeAMoveBy(state.NextMoveByBlack);
+                }
             }
             else
             {

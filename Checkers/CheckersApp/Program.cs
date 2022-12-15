@@ -40,13 +40,13 @@ CheckersBrain checkersBrain;
 gameOptions.Name = "Default";
 gameOptions.CheckerGames = new List<CheckerGame>();
 
-var dalTester = new DalTester();
-
-dalTester.TestDalFunctionality(
-     (GameRepositoryFileSystem)gameRepoFs, 
-     (GameRepositoryDatabase)gameRepoDb, 
-     (GameOptionsRepositoryFileSystem)optionRepoFs, 
-     (GameOptionsRepositoryDatabase)optionsRepoDb);
+// var dalTester = new DalTester();
+//
+// dalTester.TestDalFunctionality(
+//      (GameRepositoryFileSystem)gameRepoFs, 
+//      (GameRepositoryDatabase)gameRepoDb, 
+//      (GameOptionsRepositoryFileSystem)optionRepoFs, 
+//      (GameOptionsRepositoryDatabase)optionsRepoDb);
 
 #region MenuInitialization
 
@@ -92,30 +92,30 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 #region Load last used game option. And save current options on exit
 
-try
-{
-     
-     // Use last used options and data access system
-     var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
-     if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
-     {
-          optionRepo = optionRepoFs;
-          gameRepo = gameRepoFs;
-     }
-     else
-     {
-          optionRepo = optionsRepoDb;
-          gameRepo = gameRepoDb;
-     }
-     gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
-
-
-
-}
-catch (Exception)
-{
-     gameOptions = new CheckerGameOptions();
-}
+// try
+// {
+//      
+//      // Use last used options and data access system
+//      var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
+//      if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
+//      {
+//           optionRepo = optionRepoFs;
+//           gameRepo = gameRepoFs;
+//      }
+//      else
+//      {
+//           optionRepo = optionsRepoDb;
+//           gameRepo = gameRepoDb;
+//      }
+//      gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
+//
+//
+//
+// }
+// catch (Exception)
+// {
+//      gameOptions = new CheckerGameOptions();
+// }
 
 mainMenu.RunMenu();
 

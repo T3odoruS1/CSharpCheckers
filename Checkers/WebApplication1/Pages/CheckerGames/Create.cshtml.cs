@@ -55,6 +55,21 @@ namespace WebApplication1.Pages.CheckerGames
             _context.CheckerGameOptions.Update(options);
             _repository.SavaGame(CheckerGame);
 
+            if (CheckerGame.Player1Type == EPlayerType.Ai && CheckerGame.Player2Type == EPlayerType.Ai)
+            {
+                return RedirectToPage("./RobotBrawl", new { id = CheckerGame.Id });
+
+            }
+
+            if (CheckerGame.Player1Type == EPlayerType.Ai)
+            {
+                return RedirectToPage("./Play", new { id = CheckerGame.Id, playerNo = 1 });
+
+            }if (CheckerGame.Player2Type == EPlayerType.Ai)
+            {
+                return RedirectToPage("./Play", new { id = CheckerGame.Id, playerNo = 0 });
+
+            }
             return RedirectToPage("./LaunchGame", new { id = CheckerGame.Id });
         }
     }

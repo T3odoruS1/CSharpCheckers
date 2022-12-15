@@ -1,4 +1,6 @@
 @page
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using Domain
 @model WebApplication1.Pages.CheckerGames.IndexModel
 
 @{
@@ -57,8 +59,16 @@
             </td>
             <td>
                 Play as:
-                <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="0">@Html.DisplayFor(modelItem => item.Player1Name)</a>
+                @if (item.Player1Type != EPlayerType.Ai)
+                {
+                    <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="0">@Html.DisplayFor(modelItem => item.Player1Name)</a>
 
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Player1Name)
+
+                }
 
             </td>
             <td>
@@ -66,8 +76,16 @@
             </td>
             <td>
                 Play as:
+                @if (item.Player2Type != EPlayerType.Ai)
+                {
+                    <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="1">@Html.DisplayFor(modelItem => item.Player2Name)</a>
 
-                <a target="_blank" asp-page="./Play" asp-route-id="@item.Id" asp-route-playerNo="1">@Html.DisplayFor(modelItem => item.Player2Name)</a>
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Player2Name)
+
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Player2Type)
@@ -75,6 +93,11 @@
             <td>
                 
                 <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                @if (item is { Player1Type: EPlayerType.Ai, Player2Type: EPlayerType.Ai })
+                {
+                    <a asp-page="./RobotBrawl" asp-route-id="@item.Id" asp-route-robotBrawlMode="true" asp-route-playerNo="2">Robot brawl!</a>
+
+                }
             </td>
         </tr>
     }

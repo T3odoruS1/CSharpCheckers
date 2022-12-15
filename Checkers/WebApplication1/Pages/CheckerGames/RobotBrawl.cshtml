@@ -1,0 +1,64 @@
+@page
+@using GameBrain
+@model WebApplication1.Pages.CheckerGames.RobotBrawl
+
+<table class="table table-bordered game-table">
+    @for (var y = 0; y < Model.Board.GetLength(1); y++)
+    {
+        <tr>
+            @for (var x = 0; x < Model.Board.GetLength(0); x++)
+            {
+                <td class="game-table-cell @GetCellBgrClass(Model.Board[x, y], x, y)">
+
+                    <div class="clickable-div">@GetCellContents(Model.Board[x,y])</div>
+
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+@functions
+{
+    string GetCellContents(EGameSquareState piece)
+    {
+        switch (piece)
+        {
+            case EGameSquareState.Unplayable:
+                return "";
+            case EGameSquareState.Empty:
+                return "";
+            case EGameSquareState.Black:
+                return "◎";
+            case EGameSquareState.White:
+                return "◉";
+            case EGameSquareState.WhiteKing:
+                return "=◉=";
+            case EGameSquareState.BlackKing:
+                return "=◎=";
+        }
+        return "";
+    }
+    string GetCellBgrClass(EGameSquareState piece, int x, int y)
+    {
+    // If initial x and initial y is set then run a check if this square is available for the move.
+        return piece == EGameSquareState.Unplayable ? "game-table-cell-white" : "game-table-cell-black";
+    }
+
+    
+    
+}
+    
+@section Scripts 
+{
+   <script>
+            setTimeout(()=>{
+                window.location = '/CheckerGames/RobotBrawl?id=@Model.Game.Id';
+            },7000)
+
+
+
+    </script>
+    
+
+}

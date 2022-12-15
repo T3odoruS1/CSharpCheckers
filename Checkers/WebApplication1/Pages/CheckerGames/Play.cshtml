@@ -1,9 +1,5 @@
 @page
 @using GameBrain
-@using Microsoft.EntityFrameworkCore
-@using System.Text.Json
-@using DAL.FileSystem
-@using Domain
 @model WebApplication1.Pages.CheckerGames.Play
 
 @{
@@ -12,6 +8,11 @@
 <h3 class="checker-counter"> White: @Model.Brain.CountCheckers(false)</h3>
 <h3 class="checker-counter"> Black: @Model.Brain.CountCheckers(true)</h3>
 <br/>
+
+@(Model.Brain.CountEnemyAdjCheckers(4,3, 2, 5, false))
+@(Model.Brain.CountEnemyAdjCheckers(4,3, 6, 1, false))
+
+
 <h2>
     @if (Model.WonByBlack == null)
     {
@@ -110,7 +111,7 @@
         <script>
             setTimeout(()=>{
                 window.location = '/CheckerGames/Play?id=@Model.Game.Id&playerNo=@Model.PlayerNo';
-            },1000)
+            },@Model.AiInTheGame() ? 5000 : 1000)
 
 
 
