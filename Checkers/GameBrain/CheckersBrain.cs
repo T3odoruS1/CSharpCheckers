@@ -147,7 +147,6 @@ public class CheckersBrain
     }
 
 
-    
     /// <summary>
     /// Set all parameters for brain copy.
     /// </summary>
@@ -201,7 +200,6 @@ public class CheckersBrain
             _coordsOfTakingChecker = (state.CheckerThatPreformedTakingX.Value,
                 state.CheckerThatPreformedTakingY.Value);
         }
-
     }
 
 
@@ -217,7 +215,6 @@ public class CheckersBrain
     /// <returns>True if move is possible and false if not possible</returns>
     public bool MoveIsPossible(int iniX, int iniY, int destX, int destY, EGameSquareState[,]? board = null)
     {
-        
         // Check if coordinates are in range of game board.
         if (iniX > _checkerGameOptions.Width || iniX < 0 ||
             destX > _checkerGameOptions.Width || destX < 0 ||
@@ -236,10 +233,8 @@ public class CheckersBrain
                     !MoveIsTaking(iniX, iniY, destX, destY))
                 {
                     return false;
-
                 }
             }
-           
         }
 
         // If game square is not empty return false
@@ -439,6 +434,7 @@ public class CheckersBrain
         {
             return false;
         }
+
         var data = CountEnemyAdjCheckers(x, y, destX, destY, false);
         return data.Item1 == 1 && data.Item2 == 0 && _gameBoard[destX, destY] == EGameSquareState.Empty;
     }
@@ -465,13 +461,13 @@ public class CheckersBrain
         {
             return new Tuple<int, int>(0, 0);
         }
-        
+
         var biggerX = iniX > destX ? iniX : destX;
         var biggerY = iniY > destY ? iniY : destY;
-        
+
         var smallerX = iniX < destX ? iniX : destX;
         var smallerY = iniY < destY ? iniY : destY;
-        
+
         var xGrowing = destX > iniX;
         var yGrowing = destY > iniY;
 
@@ -487,8 +483,8 @@ public class CheckersBrain
             var y = yGrowing ? smallerY : biggerY;
             switch (_gameBoard[iniX, iniY])
             {
-                    
-                case EGameSquareState.WhiteKing: case EGameSquareState.White:
+                case EGameSquareState.WhiteKing:
+                case EGameSquareState.White:
                     if (_gameBoard[x, y] == EGameSquareState.Black ||
                         _gameBoard[x, y] == EGameSquareState.BlackKing)
                     {
@@ -507,7 +503,8 @@ public class CheckersBrain
                     }
 
                     break;
-                case EGameSquareState.BlackKing: case EGameSquareState.Black:
+                case EGameSquareState.BlackKing:
+                case EGameSquareState.Black:
                     if (_gameBoard[x, y] == EGameSquareState.White ||
                         _gameBoard[x, y] == EGameSquareState.WhiteKing)
                     {
@@ -701,82 +698,82 @@ public class CheckersBrain
 
         if (_gameBoard[iniX, iniY] == EGameSquareState.Black || _gameBoard[iniX, iniY] == EGameSquareState.White)
         {
-            if (!_gameOver)
-            {
+            
                 // Taking part for regular
-            if (Math.Abs(iniX - destX) == 2 && Math.Abs(iniY - destY) == 2)
-            {
-                _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
-                _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] = EGameSquareState.Empty;
-                _gameBoard[iniX, iniY] = EGameSquareState.Empty;
-                _takingDone = true;
-                if (!CanTake(destX, destY))
+                if (Math.Abs(iniX - destX) == 2 && Math.Abs(iniY - destY) == 2)
                 {
-                    _nextMoveByBlack = !_nextMoveByBlack;
-                    _canDoAnotherTake = false;
-                    _coordsOfTakingChecker = null;
+                    _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
+                    _gameBoard[Avg(destX, iniX), Avg(destY, iniY)] = EGameSquareState.Empty;
+                    _gameBoard[iniX, iniY] = EGameSquareState.Empty;
+                    _takingDone = true;
+                    if (!CanTake(destX, destY))
+                    {
+                        _nextMoveByBlack = !_nextMoveByBlack;
+                        _canDoAnotherTake = false;
+                        _coordsOfTakingChecker = null;
+                    }
+                    else
+                    {
+                        _canDoAnotherTake = true;
+                        _coordsOfTakingChecker = (destX, destY);
+                    }
                 }
                 else
                 {
-                    _canDoAnotherTake = true;
-                    _coordsOfTakingChecker = (destX, destY);
+                    _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
+                    _gameBoard[iniX, iniY] = EGameSquareState.Empty;
+                    _nextMoveByBlack = !_nextMoveByBlack;
+                    _canDoAnotherTake = false;
+                    _coordsOfTakingChecker = null;
+                    _takingDone = false;
                 }
-            }
-            else
-            {
-                _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
-                _gameBoard[iniX, iniY] = EGameSquareState.Empty;
-                _nextMoveByBlack = !_nextMoveByBlack;
-                _canDoAnotherTake = false;
-                _coordsOfTakingChecker = null;
-                _takingDone = false;
-            }
 
 
-            // Change regular checker into king
-            if (_gameBoard[destX, destY] == EGameSquareState.Black)
-            {
-                if (destY == 0)
+                // Change regular checker into king
+                if (_gameBoard[destX, destY] == EGameSquareState.Black)
                 {
-                    _gameBoard[destX, destY] = EGameSquareState.BlackKing;
-                    if (CanTake(destX, destY) && !_nextMoveByBlack && _takingDone)
+                    if (destY == 0)
                     {
-                        _nextMoveByBlack = true;
-                        _canDoAnotherTake = true;
-                        _coordsOfTakingChecker = (destX, destY);
+                        _gameBoard[destX, destY] = EGameSquareState.BlackKing;
+                        if (CanTake(destX, destY) && !_nextMoveByBlack && _takingDone)
+                        {
+                            _nextMoveByBlack = true;
+                            _canDoAnotherTake = true;
+                            _coordsOfTakingChecker = (destX, destY);
+                        }
 
+                        TestIfGameOver();
+
+                        return;
                     }
-                    TestIfGameOver();
-
-                    return;
                 }
-            }
-            else
-            {
-                if (destY == _gameBoard.GetLength(1) - 1)
+                else
                 {
-                    _gameBoard[destX, destY] = EGameSquareState.WhiteKing;
-                    if (CanTake(destX, destY) && _nextMoveByBlack && _takingDone)
+                    if (destY == _gameBoard.GetLength(1) - 1)
                     {
-                        _nextMoveByBlack = false;
-                        _canDoAnotherTake = true;
-                        _coordsOfTakingChecker = (destX, destY);
+                        _gameBoard[destX, destY] = EGameSquareState.WhiteKing;
+                        if (CanTake(destX, destY) && _nextMoveByBlack && _takingDone)
+                        {
+                            _nextMoveByBlack = false;
+                            _canDoAnotherTake = true;
+                            _coordsOfTakingChecker = (destX, destY);
+                        }
 
+                        TestIfGameOver();
+
+                        return;
                     }
-                    TestIfGameOver();
-
-                    return;
-
                 }
-            }
+                
+            
+
+            
         }
-
         if (_gameBoard[iniX, iniY] == EGameSquareState.BlackKing ||
             _gameBoard[iniX, iniY] == EGameSquareState.WhiteKing)
         {
             // Check if there are 1 checker on the diagonal between the coords and no allie checkers.
-            if (CountEnemyAdjCheckers(iniX, iniY, destX, destY, false).Item1 == 1 &&
-                CountEnemyAdjCheckers(iniX, iniY, destX, destY, false).Item2 == 0)
+            if (MoveIsTaking(iniX, iniY, destX, destY))
             {
                 // Taking is preformed
                 _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
@@ -805,12 +802,10 @@ public class CheckersBrain
                 _takingDone = false;
             }
         }
-            }
-            
+
 
         TestIfGameOver();
     }
-
 
 
     /// <summary>
@@ -898,7 +893,7 @@ public class CheckersBrain
         var i = rnd.Next(allMoves.Count);
         return allMoves[i];
     }
-    
+
     /// <summary>
     /// Get all possible moves for player
     /// </summary>
@@ -925,7 +920,6 @@ public class CheckersBrain
                 {
                     ret.Add((xi, yi));
                 }
-
             }
         }
 
@@ -949,8 +943,6 @@ public class CheckersBrain
         return ret;
     }
 
-    
-
 
     public (int x, int y) MakeMoveByAi(bool isBlack)
     {
@@ -964,7 +956,6 @@ public class CheckersBrain
         Console.WriteLine("Ai prefomed a move");
         return (rndMove.destX, rndMove.destY);
     }
-
 
 
     private Move PreformMiniMaxDecision(bool isBlack)
@@ -1009,7 +1000,6 @@ public class CheckersBrain
                 if (MoveIsPossible(move.x, move.y, move.destX, move.destY))
                 {
                     moves.Add(move);
-
                 }
             }
         }
@@ -1051,7 +1041,7 @@ public class CheckersBrain
     {
         var regular = 0;
         var kings = 0;
-        
+
         for (int yi = 0; yi < _checkerGameOptions.Height; yi++)
         {
             for (int xi = 0; xi < _checkerGameOptions.Width; xi++)
