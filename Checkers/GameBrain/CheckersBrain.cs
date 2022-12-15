@@ -106,9 +106,9 @@ public class CheckersBrain
     public EGameSquareState[,] GetBoard()
     {
         var res = new EGameSquareState[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
-        for (var i = 0; i < _gameBoard.GetLength(0); i++)
+        for (var i = 0; i < _checkerGameOptions.Width; i++)
         {
-            for (var j = 0; j < _gameBoard.GetLength(1); j++)
+            for (var j = 0; j < _checkerGameOptions.Height; j++)
             {
                 res[i, j] = _gameBoard[i, j];
             }
@@ -219,10 +219,10 @@ public class CheckersBrain
     {
         
         // Check if coordinates are in range of game board.
-        if (iniX > _checkerGameOptions.Height || iniX < 0 ||
-            destX > _checkerGameOptions.Height || destX < 0 ||
-            iniY > _checkerGameOptions.Width || iniY < 0 ||
-            destY > _checkerGameOptions.Width || destY < 0)
+        if (iniX > _checkerGameOptions.Width || iniX < 0 ||
+            destX > _checkerGameOptions.Width || destX < 0 ||
+            iniY > _checkerGameOptions.Height || iniY < 0 ||
+            destY > _checkerGameOptions.Height || destY < 0)
         {
             return false;
         }
@@ -383,9 +383,9 @@ public class CheckersBrain
     {
         var whiteCount = 0;
         var blackCount = 0;
-        for (int y = 0; y < _gameBoard.GetLength(1); y++)
+        for (int y = 0; y < _checkerGameOptions.Height; y++)
         {
-            for (int x = 0; x < _gameBoard.GetLength(0); x++)
+            for (int x = 0; x < _checkerGameOptions.Width; x++)
             {
                 if (_gameBoard[x, y] == EGameSquareState.Black || _gameBoard[x, y] == EGameSquareState.BlackKing)
                 {
@@ -432,10 +432,10 @@ public class CheckersBrain
 
     private bool MoveIsTaking(int x, int y, int destX, int destY)
     {
-        if (x > _checkerGameOptions.Height || x < 0 ||
-            destX > _checkerGameOptions.Height || destX < 0 ||
-            y > _checkerGameOptions.Width || y < 0 ||
-            destY > _checkerGameOptions.Width || destY < 0)
+        if (x > _checkerGameOptions.Width || x < 0 ||
+            destX > _checkerGameOptions.Width || destX < 0 ||
+            y > _checkerGameOptions.Height || y < 0 ||
+            destY > _checkerGameOptions.Height || destY < 0)
         {
             return false;
         }
@@ -651,9 +651,9 @@ public class CheckersBrain
 
         if (_gameBoard[x, y] == EGameSquareState.BlackKing || _gameBoard[x, y] == EGameSquareState.WhiteKing)
         {
-            for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
+            for (int yi = 0; yi < _checkerGameOptions.Width; yi++)
             {
-                for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
+                for (int xi = 0; xi < _checkerGameOptions.Height; xi++)
                 {
                     // Check if diagonal and difference if bigger than 1
                     if (Math.Abs(x - xi) == Math.Abs(y - yi) &&
@@ -847,9 +847,9 @@ public class CheckersBrain
     public int CountCheckers(bool black)
     {
         int checkers = 0;
-        for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
+        for (int yi = 0; yi < _checkerGameOptions.Height; yi++)
         {
-            for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
+            for (int xi = 0; xi < _checkerGameOptions.Width; xi++)
             {
                 if (black && (_gameBoard[xi, yi] == EGameSquareState.Black ||
                               _gameBoard[xi, yi] == EGameSquareState.BlackKing))
@@ -900,9 +900,9 @@ public class CheckersBrain
     private List<(int x, int y)> GetAllMovableCheckersFor(bool isBlack)
     {
         List<(int x, int y)> ret = new();
-        for (var yi = 0; yi < _gameBoard.GetLength(1); yi++)
+        for (var yi = 0; yi < _checkerGameOptions.Height; yi++)
         {
-            for (var xi = 0; xi < _gameBoard.GetLength(0); xi++)
+            for (var xi = 0; xi < _checkerGameOptions.Width; xi++)
             {
                 if (isBlack &&
                     (_gameBoard[xi, yi] == EGameSquareState.Black ||
@@ -928,9 +928,9 @@ public class CheckersBrain
     private List<(int x, int y, int destX, int destY)> GetMovesFor(int x, int y)
     {
         var ret = new List<(int x, int y, int destX, int destY)>();
-        for (int yi = 0; yi < _gameBoard.GetLength(1); yi++)
+        for (int yi = 0; yi < _checkerGameOptions.Height; yi++)
         {
-            for (int xi = 0; xi < _gameBoard.GetLength(0); xi++)
+            for (int xi = 0; xi < _checkerGameOptions.Width; xi++)
             {
                 if (MoveIsPossible(x, y, xi, yi))
                 {
@@ -1045,9 +1045,9 @@ public class CheckersBrain
         var regular = 0;
         var kings = 0;
         
-        for (int yi = 0; yi < board.GetLength(1); yi++)
+        for (int yi = 0; yi < _checkerGameOptions.Height; yi++)
         {
-            for (int xi = 0; xi < board.GetLength(0); xi++)
+            for (int xi = 0; xi < _checkerGameOptions.Width; xi++)
             {
                 if (isBlack)
                 {
