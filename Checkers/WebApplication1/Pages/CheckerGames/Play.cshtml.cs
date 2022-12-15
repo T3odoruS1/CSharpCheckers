@@ -82,6 +82,8 @@ public class Play : PageModel
         var jagged = JsonSerializer.Deserialize<EGameSquareState[][]>(jsonString);
         Board = FsHelpers.JaggedTo2D(jagged!);
         Brain.SetGameBoard(Board, GameState);
+        Brain.TestIfGameOver();
+
         
         #endregion
 
@@ -108,7 +110,7 @@ public class Play : PageModel
 
         
 
-        if (!IsPlayerMove() && OpositePlayerIsAi() && Game.GameOverAt == null)
+        if (!IsPlayerMove() && OpositePlayerIsAi() && !Brain.IsGameOver())
         {
             var move = Brain.MakeMoveByAi(playerNo != 1);
             UpdateRepo(move.x, move.y);
@@ -130,6 +132,7 @@ public class Play : PageModel
 
 
         Brain.MoveChecker(initX.Value, initY.Value, x.Value, y.Value);
+        
         
         UpdateRepo(x.Value, y.Value);
 

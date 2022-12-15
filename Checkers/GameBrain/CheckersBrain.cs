@@ -701,7 +701,9 @@ public class CheckersBrain
 
         if (_gameBoard[iniX, iniY] == EGameSquareState.Black || _gameBoard[iniX, iniY] == EGameSquareState.White)
         {
-            // Taking part for regular
+            if (!_gameOver)
+            {
+                // Taking part for regular
             if (Math.Abs(iniX - destX) == 2 && Math.Abs(iniY - destY) == 2)
             {
                 _gameBoard[destX, destY] = _gameBoard[iniX, iniY];
@@ -744,6 +746,7 @@ public class CheckersBrain
                         _coordsOfTakingChecker = (destX, destY);
 
                     }
+                    TestIfGameOver();
 
                     return;
                 }
@@ -760,8 +763,10 @@ public class CheckersBrain
                         _coordsOfTakingChecker = (destX, destY);
 
                     }
+                    TestIfGameOver();
 
                     return;
+
                 }
             }
         }
@@ -800,6 +805,8 @@ public class CheckersBrain
                 _takingDone = false;
             }
         }
+            }
+            
 
         TestIfGameOver();
     }

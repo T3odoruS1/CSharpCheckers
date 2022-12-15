@@ -18,10 +18,13 @@
         <h2>
             Your status: @GetPlayerMoveStatus()
         </h2>
-        <h2>
-            Next move: @(!Model.Brain.NextMoveByBlack() ? $"Player One - {Model.Game.Player1Name} - White" :
-                           $"Player Two - {Model.Game.Player2Name} - Black")
-        </h2>
+        if (!Model.Brain.IsGameOver())
+        {
+            <h2>
+                Next move: @(!Model.Brain.NextMoveByBlack() ? $"Player One - {Model.Game.Player1Name} - White" :
+                               $"Player Two - {Model.Game.Player2Name} - Black")
+            </h2>
+        }
     }
     else
     {
@@ -110,7 +113,7 @@
 
 @section Scripts 
 {
-    @if (!Model.IsPlayerMove())
+    @if (!Model.IsPlayerMove() && !Model.Brain.IsGameOver())
     {
         <script>
             setTimeout(()=>{
@@ -191,6 +194,10 @@
 
     string GetPlayerMoveStatus()
     {
+        if (Model.Brain.IsGameOver())
+        {
+            return $"Game over! Winner is {GetWinner()}";
+        }
         if (Model.GameState.NextMoveByBlack && Model.PlayerNo == 1)
         {
             return "Your turn!";
@@ -200,6 +207,19 @@
             return "Your turn!";
         }
         return "Please wait for opponents move";
+    }
+
+    string GetWinner()
+    {
+        if (Model.Brain.GameWonByBlack())
+        {
+            return "Black! - " + Model.Game.Player2Name;
+        } if (!Model.Brain.GameWonByBlack())
+        {
+            return "White! - " + Model.Game.Player1Name;
+
+        }
+        return "";
     }
 
 

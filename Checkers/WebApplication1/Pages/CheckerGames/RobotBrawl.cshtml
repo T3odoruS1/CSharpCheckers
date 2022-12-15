@@ -2,6 +2,33 @@
 @using GameBrain
 @model WebApplication1.Pages.CheckerGames.RobotBrawl
 
+<h3 class="checker-counter"> White: @Model.Brain.CountCheckers(false)</h3>
+<h3 class="checker-counter"> Black: @Model.Brain.CountCheckers(true)</h3>
+
+
+<h2>
+    @if (Model.WonByBlack == null)
+    {
+
+        <h2>
+            Current droid: @GetDroidName()
+        </h2>
+        <h2>
+            Next move: @(!Model.Brain.NextMoveByBlack() ? $"Player One - {Model.Game.Player1Name} - White" :
+                           $"Player Two - {Model.Game.Player2Name} - Black")
+        </h2>
+    }
+    else
+    {
+        <h2>
+            Game won by: @(Model.WonByBlack == true ? Model.Game.Player2Name + " Black " :
+                             Model.Game.Player1Name + " White ")
+        </h2>
+    }
+
+</h2>
+
+
 <table class="table table-bordered game-table">
     @for (var y = 0; y < Model.Board.GetLength(1); y++)
     {
@@ -45,9 +72,15 @@
         return piece == EGameSquareState.Unplayable ? "game-table-cell-white" : "game-table-cell-black";
     }
 
-    
-    
+
+    string GetDroidName()
+    {
+        return "";
+    }
 }
+
+    
+
     
 @section Scripts 
 {
