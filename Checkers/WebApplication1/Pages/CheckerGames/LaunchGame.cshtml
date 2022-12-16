@@ -2,8 +2,6 @@
 @model WebApplication1.Pages.CheckerGames.LaunchGame
 
 
-<h2>Please check for pop-up bocker if game screens were not launched in 2 separate tabs. Disable adblock</h2>
-
 Link 1 <a id="link0" asp-page="Play" asp-route-playerNo="0" asp-route-id="@Model.GameId">Player 1 page</a>
 Link 2 <a id="link1" asp-page="Play" asp-route-playerNo="1" asp-route-id="@Model.GameId" target="_blank">Player 2 page</a>
 
@@ -20,7 +18,7 @@ Link 2 <a id="link1" asp-page="Play" asp-route-playerNo="1" asp-route-id="@Model
                   
                   link0.click();
           
-        }, 1000);
+        }, 250);
         
         
         

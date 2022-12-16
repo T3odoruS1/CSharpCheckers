@@ -92,30 +92,30 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 #region Load last used game option. And save current options on exit
 
-// try
-// {
-//      
-//      // Use last used options and data access system
-//      var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
-//      if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
-//      {
-//           optionRepo = optionRepoFs;
-//           gameRepo = gameRepoFs;
-//      }
-//      else
-//      {
-//           optionRepo = optionsRepoDb;
-//           gameRepo = gameRepoDb;
-//      }
-//      gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
-//
-//
-//
-// }
-// catch (Exception)
-// {
-//      gameOptions = new CheckerGameOptions();
-// }
+try
+{
+     
+     // Use last used options and data access system
+     var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
+     if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
+     {
+          optionRepo = optionRepoFs;
+          gameRepo = gameRepoFs;
+     }
+     else
+     {
+          optionRepo = optionsRepoDb;
+          gameRepo = gameRepoDb;
+     }
+     gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
+
+
+
+}
+catch (Exception)
+{
+     gameOptions = new CheckerGameOptions();
+}
 
 mainMenu.RunMenu();
 
@@ -201,6 +201,13 @@ string LoadGame()
 {
      Console.Clear();
      var allSavedGames = gameRepo.GetAllGamesList();
+     if (allSavedGames.Count == 0)
+     {
+          Console.WriteLine("No saved games found. Returning to menu");
+          Thread.Sleep(2000);
+          return "B";
+
+     }
      var i = 1;
      var gameDict = new Dictionary<int, CheckerGame>();
      foreach (var savedGame in allSavedGames)
