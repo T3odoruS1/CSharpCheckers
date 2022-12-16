@@ -12,7 +12,7 @@ public static class UI
     /// <param name="board">Game board in form of 2d array with enums</param>
     /// <param name="activeX">Optional parameter used for hilighting a cell</param>
     /// <param name="activeY">Optional parameter used for hilighting a cell</param>
-    public static void DrawGameBoard(EGameSquareState[,] board, int? activeX, int? activeY)
+    public static void DrawGameBoard(EGameSquareState[,] board, int? activeX = null, int? activeY = null)
     {
         var width = board.GetLength(0);
         var height = board.GetLength(1);

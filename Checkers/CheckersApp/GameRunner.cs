@@ -54,18 +54,25 @@ public class GameRunner
             {
                 if (state.NextMoveByBlack && _game.Player2Type == EPlayerType.Ai)
                 {
+                    Console.WriteLine("Preforming ai move for player 2");
                     _brain.MakeMoveByAi(state.NextMoveByBlack);
                     var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
                     var nState = CreateNewState(coords.x, coords.y, false);
                     _game.CheckerGameStates.Add(nState);
                     _repo.UpdateGame(_game);
+                    UI.DrawGameBoard(_brain.GetBoard());
+                    Thread.Sleep(2000);
                 }
                 else if (!state.NextMoveByBlack && _game.Player1Type == EPlayerType.Ai)
                 {
+                    Console.WriteLine("Preforming ai move for player 1");
+
                     var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
                     var nState = CreateNewState(coords.x, coords.y, false);
                     _game.CheckerGameStates.Add(nState);
                     _repo.UpdateGame(_game);
+                    UI.DrawGameBoard(_brain.GetBoard());
+                    Thread.Sleep(2000);
                 }
                 else
                 {
@@ -157,7 +164,7 @@ public class GameRunner
                         Console.Clear();
                         Console.WriteLine("In with game options in this game the taking is not mandatory. You can press x" +
                                           "to stop taking or any other button to continue.");
-                        UI.DrawGameBoard(_brain.GetBoard(), null, null);
+                        UI.DrawGameBoard(_brain.GetBoard());
 
                         var key = Console.ReadKey(true).Key;
                         if (key == ConsoleKey.X)
@@ -183,7 +190,7 @@ public class GameRunner
                     destIsValid = true;
                 }
                 Console.Clear();
-                UI.DrawGameBoard(_brain.GetBoard(), null, null);
+                UI.DrawGameBoard(_brain.GetBoard());
                 _game.CheckerGameStates!.Add(newState);
                 _repo.UpdateGame(_game);
             }
@@ -222,7 +229,7 @@ public class GameRunner
             Console.Clear();
             PrintNextPlayer(nextMoveByBlack);
 
-            UI.DrawGameBoard(_brain.GetBoard(), null, null);
+            UI.DrawGameBoard(_brain.GetBoard());
             Console.WriteLine("Choose a checker to move");
             Console.WriteLine("Enter checker row: ");
 

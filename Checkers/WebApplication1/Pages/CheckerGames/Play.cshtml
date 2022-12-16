@@ -71,10 +71,9 @@
                     {
                         if (Model.Brain.MoveIsPossible((int)Model.InitX, (int)Model.InitY, x, y) ||
                             (x == Model.InitX &&
-                             y == Model.InitY &&
-                             Model.GameState.CheckerThatPreformedTakingX == null))
+                             y == Model.InitY ))
                         {
-                            if (Model.InitX != x && Model.InitY != y)
+                            if (Model.InitX != x && Model.InitY != y && Model.GameState.CheckerThatPreformedTakingX == null)
                             {
                                 <div class="clickable-div highlighted-div active-checker-div" onclick="window.
                             location = '/CheckerGames/Play?id=@Model.Game.Id&x=@x&y=@y&initX=@Model.InitX&initY=@Model.InitY&playerNo=@Model.PlayerNo'">
