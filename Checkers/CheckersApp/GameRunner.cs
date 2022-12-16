@@ -60,9 +60,9 @@ public class GameRunner
                     
                     var nState = CreateNewState(coords.x, coords.y, false);
                     _game.CheckerGameStates.Add(nState);
+                    _game.GameOptions = options;
                     _repo.UpdateGame(_game);
                     UI.DrawGameBoard(_brain.GetBoard());
-                    Thread.Sleep(2000);
                 }
                 else if (!state.NextMoveByBlack && _game.Player1Type == EPlayerType.Ai)
                 {
@@ -71,9 +71,9 @@ public class GameRunner
                     var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
                     var nState = CreateNewState(coords.x, coords.y, false);
                     _game.CheckerGameStates.Add(nState);
+                    _game.GameOptions = options;
                     _repo.UpdateGame(_game);
                     UI.DrawGameBoard(_brain.GetBoard());
-                    Thread.Sleep(2000);
                 }
                 else
                 {
@@ -130,7 +130,7 @@ public class GameRunner
         {
             Console.Clear();
             UI.DrawGameBoard(_brain.GetBoard(), x, y);
-            Console.WriteLine("Now choose where to move this checker row");
+            Console.WriteLine("Now choose where to move this checker column");
 
             var userXChoice = Console.ReadLine();
             if (!int.TryParse(userXChoice, out var destX))
@@ -139,7 +139,7 @@ public class GameRunner
             }
             destX -= 1;
             
-            Console.WriteLine("Now choose where to move this checker column");
+            Console.WriteLine("Now choose where to move this checker row");
             
             
             var userYChoice = Console.ReadLine();
@@ -193,6 +193,7 @@ public class GameRunner
                 Console.Clear();
                 UI.DrawGameBoard(_brain.GetBoard());
                 _game.CheckerGameStates!.Add(newState);
+                
                 _repo.UpdateGame(_game);
             }
             else
@@ -232,7 +233,7 @@ public class GameRunner
 
             UI.DrawGameBoard(_brain.GetBoard());
             Console.WriteLine("Choose a checker to move");
-            Console.WriteLine("Enter checker row: ");
+            Console.WriteLine("Enter checker column: ");
 
             var userXChoice = Console.ReadLine();
             if (!int.TryParse(userXChoice, out var xi))
@@ -242,10 +243,11 @@ public class GameRunner
 
             xi -= 1;
 
-            Console.WriteLine("Enter checker column: ");
+            Console.WriteLine("Enter checker row: ");
 
             var userYChoice = Console.ReadLine();
             if (!int.TryParse(userYChoice, out var yi))
+                
             {
                 continue;
             }

@@ -11,10 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using static System.ConsoleKey;
 
 
-var gameOptions = new CheckerGameOptions
-{
-     Name = "Default"
-};
+
 
 var dbOptions = new DbContextOptionsBuilder<AppDbContext>()
 .UseSqlite("Data Source=/Users/edgarvildt/Developer/CheckerDb/checker.db").Options;
@@ -22,6 +19,7 @@ var ctx = new AppDbContext(dbOptions);
 
 
 var lastUsedRepoFs = new GameOptionsLastUsedFileSystem();
+const string DEFAULT = "Default";
 
 var lastUsedRepo = lastUsedRepoFs;
 
@@ -35,9 +33,26 @@ IGameOptionRepository optionsRepoDb = new GameOptionsRepositoryDatabase(ctx);
 
 var optionRepo = optionsRepoDb;
 
+var gameOptionsList = optionRepo.GetGameOptionsList();
+var gameOptions = new CheckerGameOptions
+{
+     Name = DEFAULT
+};
+
+if (gameOptionsList.Count != 0 &&
+    gameOptionsList.FirstOrDefault(o => o!.Name == DEFAULT, null) != null)
+{
+     gameOptions = gameOptionsList.First(o => o!.Name == DEFAULT);
+}
+else
+{
+     optionRepo.SaveGameOptions(gameOptions);
+     
+}
+
+
 
 CheckersBrain checkersBrain;
-gameOptions.Name = "Default";
 gameOptions.CheckerGames = new List<CheckerGame>();
 
 // var dalTester = new DalTester();
@@ -91,31 +106,31 @@ var mainMenu = new Menu(EMenuLevel.Main,
 
 
 #region Load last used game option. And save current options on exit
-
-try
-{
-     
-     // Use last used options and data access system
-     var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
-     if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
-     {
-          optionRepo = optionRepoFs;
-          gameRepo = gameRepoFs;
-     }
-     else
-     {
-          optionRepo = optionsRepoDb;
-          gameRepo = gameRepoDb;
-     }
-     gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
-
-
-
-}
-catch (Exception)
-{
-     gameOptions = new CheckerGameOptions();
-}
+//
+// try
+// {
+//      
+//      // Use last used options and data access system
+//      var lastUsed = lastUsedRepo.GetLastUsedOptionsId();
+//      if (lastUsed.dalMethod == FsHelpers.FileSystemIdentifier)
+//      {
+//           optionRepo = optionRepoFs;
+//           gameRepo = gameRepoFs;
+//      }
+//      else
+//      {
+//           optionRepo = optionsRepoDb;
+//           gameRepo = gameRepoDb;
+//      }
+//      gameOptions = optionRepo.GetOptionsById(lastUsed.optId);
+//
+//
+//
+// }
+// catch (Exception)
+// {
+//      gameOptions = new CheckerGameOptions();
+// }
 
 mainMenu.RunMenu();
 
@@ -145,6 +160,8 @@ string ChangeRepoType()
      {
           optionRepo = optionsRepoDb;
      }
+
+     gameOptions = optionsRepoDb.GetGameOptionsList().First(o => o.Name == DEFAULT);
      WaitForUserInput();
 
      
@@ -212,7 +229,7 @@ string LoadGame()
      var gameDict = new Dictionary<int, CheckerGame>();
      foreach (var savedGame in allSavedGames)
      {
-          Console.WriteLine($"\n{i}) - {savedGame.Name}");
+          Console.WriteLine($"\n{i}) - {savedGame}");
           
           Console.WriteLine(savedGame.GameOptions);
           var jaggedBoard =
@@ -226,7 +243,7 @@ string LoadGame()
           i++;
      }
      
-     Console.WriteLine("Choose the game you want to load");
+     Console.WriteLine("Choose the game you want to load. Press x if you want to exit");
      var userChoice = Console.ReadLine();
      if (userChoice == "x" || userChoice == "X")
      {
@@ -264,14 +281,6 @@ string DoNewGame()
      Console.Clear();
      Console.WriteLine("\n\n\n\nNew game! Time to play!\n");
      Console.WriteLine("Game will be using your current game options");
-
-     if (gameOptions.Name == "" || gameOptions.Id == null)
-     {
-          
-          Console.WriteLine("Looks like your game options are not saved.");
-          Console.WriteLine("To start this game you should save them. Give them the name please\n");
-          SaveCurrentOptions();
-     }
      
      // Make game brains produce a game board by given options
      checkersBrain = new CheckersBrain(gameOptions);
@@ -291,7 +300,7 @@ string DoNewGame()
           Console.WriteLine("Enter a name for the game please\n");
           gameName = Console.ReadLine()!;
      } while (gameName == "" &&
-              !(gameName.Length > 0) &&
+              !(gameName.Length > 1) &&
               !(gameName.Length < 128) &&
               gameName.Contains('"'));
 
@@ -306,7 +315,7 @@ string DoNewGame()
           playerName = Console.ReadLine()!;
           
           
-     } while (playerName.Length is < 129 and > 0 && playerName.Contains('"'));
+     } while (playerName.Length is < 129 and > 1 && playerName.Contains('"'));
 
      newGame.Player1Name = playerName;
 
@@ -339,7 +348,7 @@ string DoNewGame()
           playerName = Console.ReadLine()!;
           
           
-     } while (playerName.Length is < 129 and > 0 && playerName.Contains('"'));
+     } while (playerName.Length is < 129 and > 1 && playerName.Contains('"'));
      
      newGame.Player2Name = playerName;
 
@@ -478,10 +487,15 @@ string RunSubmenu()
      
      var menuItems = new List<MenuItem>();
      var listOfOptions = new List<CheckerGameOptions>();
+     
      var i = 0;
      // For each option choice shortcut is a number in string form, other shortcuts are standard
      foreach (var gameOption in optionRepo.GetGameOptionsList())
      {
+          if (gameOption.Name == DEFAULT)
+          {
+               continue;
+          }
           menuItems.Add(new MenuItem(i.ToString(), 
                gameOption.Name + ":" + 
                $"Height: {gameOption.Height}," +

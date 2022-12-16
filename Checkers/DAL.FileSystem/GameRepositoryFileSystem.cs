@@ -23,7 +23,7 @@ public class GameRepositoryFileSystem : IGameRepository
         foreach (var fileName in Directory.GetFileSystemEntries(
                      _gameDir, "*" + FileExtension))
         {
-            games.Add(GetGameById(Int32.Parse(fileName))); 
+            games.Add(GetGameById(Int32.Parse(Path.GetFileNameWithoutExtension(fileName)))); 
         }
         return games;
     }

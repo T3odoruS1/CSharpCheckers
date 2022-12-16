@@ -1,4 +1,5 @@
-﻿using GameBrain;
+﻿using System.Diagnostics;
+using GameBrain;
 
 namespace ConsoleUI;
 
@@ -109,12 +110,21 @@ public static class UI
     /// <returns>index as string</returns>
     private static string GetRowIndexWithWhitespacesForIndex(int i, int height)
     {
-        return (height - i) switch
+        string str;
+        switch (i + 1)
         {
-            < 100 and >= 10 => ((i + 1) + "  "),
-            >= 100 => ((i + 1) + " "),
-            < 10 => ((i + 1) + "   ")
-        };
+            case <= 9:
+                str = (i + 1) + "   ";
+                break;
+            case < 100:
+                str = (i + 1) + "  ";
+                break;
+            default:
+                str = (i + 1) + "  ";
+                break;
+        }
+        return str;
+
     }
     
 }
