@@ -260,7 +260,7 @@ string DoNewGame()
      Console.WriteLine("\n\n\n\nNew game! Time to play!\n");
      Console.WriteLine("Game will be using your current game options");
 
-     if (gameOptions.Name == "")
+     if (gameOptions.Name == "" || gameOptions.Id == null)
      {
           
           Console.WriteLine("Looks like your game options are not saved.");
@@ -330,7 +330,7 @@ string DoNewGame()
      {
           
           Console.Clear();
-          Console.WriteLine("\n\n\n\nPlease enter first user name between 1 and 128 symbols\n");
+          Console.WriteLine("\n\n\n\nPlease enter second user name between 1 and 128 symbols\n");
           playerName = Console.ReadLine()!;
           
           
