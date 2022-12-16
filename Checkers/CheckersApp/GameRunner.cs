@@ -55,8 +55,9 @@ public class GameRunner
                 if (state.NextMoveByBlack && _game.Player2Type == EPlayerType.Ai)
                 {
                     Console.WriteLine("Preforming ai move for player 2");
-                    _brain.MakeMoveByAi(state.NextMoveByBlack);
+
                     var coords = _brain.MakeMoveByAi(state.NextMoveByBlack);
+                    
                     var nState = CreateNewState(coords.x, coords.y, false);
                     _game.CheckerGameStates.Add(nState);
                     _repo.UpdateGame(_game);
