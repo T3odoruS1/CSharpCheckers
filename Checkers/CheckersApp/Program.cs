@@ -228,6 +228,11 @@ string LoadGame()
      
      Console.WriteLine("Choose the game you want to load");
      var userChoice = Console.ReadLine();
+     if (userChoice == "x" || userChoice == "X")
+     {
+          return "B";
+     }
+
      if (!int.TryParse(userChoice, out var a))
      {
           LoadGame();
