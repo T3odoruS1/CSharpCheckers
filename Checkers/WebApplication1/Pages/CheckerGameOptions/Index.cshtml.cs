@@ -12,9 +12,9 @@ namespace WebApplication1.Pages.CheckerGameOptions
 {
     public class IndexModel : PageModel
     {
-        private readonly DAL.Db.AppDbContext _context;
+        private readonly AppDbContext _context;
 
-        public IndexModel(DAL.Db.AppDbContext context)
+        public IndexModel(AppDbContext context)
         {
             _context = context;
         }
@@ -26,6 +26,18 @@ namespace WebApplication1.Pages.CheckerGameOptions
             if (_context.CheckerGameOptions != null)
             {
                 CheckerGameOptions = await _context.CheckerGameOptions.ToListAsync();
+                if (CheckerGameOptions.Count == 0)
+                {
+                    var option = new Domain.CheckerGameOptions()
+                    {
+                        Name = "Default"
+                    };
+                    _context.CheckerGameOptions.Add(option);
+                    await _context.SaveChangesAsync();
+                    CheckerGameOptions = await _context.CheckerGameOptions.ToListAsync();
+
+                    
+                }
             }
         }
     }

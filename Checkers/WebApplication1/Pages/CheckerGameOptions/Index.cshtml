@@ -59,8 +59,12 @@
             <td>
                 @if (item.GameCount > 0)
                 {
-                    <text>Can't delete. There are games using these options. Delete those games first</text>
-                }else
+                    <text>Can't delete option with games.</text>
+                }else if (item.Name == "Default")
+                {
+                    <text>Can't delete default options.</text>
+                }
+                else
                 {
                     <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
                 }

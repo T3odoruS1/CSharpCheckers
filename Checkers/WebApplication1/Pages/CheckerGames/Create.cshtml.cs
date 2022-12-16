@@ -22,6 +22,17 @@ namespace WebApplication1.Pages.CheckerGames
 
         public IActionResult OnGet()
         {
+            var CheckerGameOptions =  _context.CheckerGameOptions.ToList();
+            if (CheckerGameOptions.Count == 0)
+            {
+                var option = new Domain.CheckerGameOptions()
+                {
+                    Name = "Default"
+                };
+                _context.CheckerGameOptions.Add(option);
+                _context.SaveChanges();
+            }
+
             OptionsSelectList = new SelectList(_context.CheckerGameOptions, "Id", "Name");
             return Page();
         }
