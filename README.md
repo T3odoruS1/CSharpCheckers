@@ -1,5 +1,5 @@
 # icd0008-2022f
 
-
+ This project was developed as a Task for Programming in C# course from TalTech univercity. Checkers web app is implemented using ASP .net framework. There is also working console versoion of the game, that shares the same database if using EF core database framework. For console application there is a choice to choose between database(EF core) and json saving type(as JSON files). Both repositories are implemented using parent interfaces. This provides better code quality and less potential errors. Main focus was on the web aspect of the app. You can configure custom rules including custom boards, who starts first and if taking is mandatory. In this project you can play against AI, that is using MiniMax algorythm for desicion making. You can make 2 AIs play against each other and watch them compete. This project has a multiplayer, but there is no user system develped. You can play in different browser tabs when playing in web app. In console app players just take turns from the same session.
 
 
